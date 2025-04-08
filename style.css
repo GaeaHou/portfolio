@@ -53,3 +53,49 @@ nav a:hover {
 nav a:hover::after {
   background-color: #ce2b7b;
 }
+
+/* Step 3.1: 表单元素字体继承页面样式 */
+input, textarea, button {
+  font: inherit;
+}
+
+/* Step 3.3: 使用 CSS Grid 实现两列对齐布局 */
+.contact-form {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1em;
+  max-width: 600px;
+  margin: 2em auto;
+}
+
+/* 让 label 本身不占格子，仅它的内容参与布局 */
+.contact-form label {
+  display: contents;
+}
+
+/* 表单控件样式 */
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* 提交按钮跨整行居中 */
+.contact-form button {
+  grid-column: 1 / -1;
+  padding: 0.75em;
+  background-color: #007acc;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.contact-form button:hover {
+  background-color: #005fa3;
+}
