@@ -131,3 +131,57 @@ h2 {
   text-wrap: balance;
   margin: 0;
 }
+
+.cv-page .cv-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 2em;
+  margin-top: 2em;
+}
+
+.cv-page aside {
+  background: #f8f8f8;
+  padding: 1.5em;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  text-align: center;
+  height: fit-content;
+}
+
+.cv-page aside img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1em;
+}
+
+.cv-page main {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+}
+
+.cv-page main section article {
+  background-color: #f9f9f9;
+  padding: 1em;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* PDF下载按钮样式优化 */
+.cv-page a[href$=".pdf"] {
+  display: inline-block;
+  background-color: #007acc;
+  color: white;
+  padding: 0.75em 1.5em;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+  margin-top: 1em;
+  transition: background-color 0.3s ease;
+}
+
+.cv-page a[href$=".pdf"]:hover {
+  background-color: #005fa3;
+}
