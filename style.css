@@ -146,7 +146,7 @@ input, textarea, button {
 /* ===== CV 页面布局 ===== */
 .cv-page .cv-layout {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 1fr 260px;
   gap: 2em;
   margin-top: 2em;
 }
