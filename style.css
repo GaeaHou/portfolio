@@ -11,22 +11,45 @@ nav li {
 }
 
 nav {
-  display: flex;           /* 开启 flex 布局 */
-  justify-content: space-between;  /* 可选：菜单项自动分布 */
-  background-color: #ceabec;       /* 可选：背景色 */
-  padding: 10px 0;                /* 可选：上下内边距 */
+  display: flex;
+  border-bottom: 1px solid #ccc;
+  background-color: white;
 }
 
 nav a {
-  flex: 1;                /* 每个 a 标签占相同空间 */
-  text-align: center;     /* 文字居中 */
-  text-decoration: none;  /* 去掉下划线 */
-  color: white;          /* 文本颜色 */
-  padding: 10px;          /* 内边距 */
+  flex: 1;
+  text-align: center;
+  text-decoration: none;
+  padding: 16px 0;
+  color: black;
+  position: relative;
+  font-weight: bold;
+  transition: all 0.3s ease-in-out;
 }
 
-nav a.current {
-  font-weight: bold;
-  color: white;
-  background-color: #ceabec;  /* 当前菜单项高亮背景色 */
+/* 下划线（hover 或 current）效果 */
+nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 8px;
+  left: 20%;
+  width: 60%;
+  height: 4px;
+  background-color: transparent;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* 当前页面高亮下划线 */
+nav a.current::after {
+  background-color: #adb7bb;
+}
+
+/* 鼠标悬停时的效果 */
+nav a:hover {
+  background-color: #fceef5;
+  color: black;
+}
+
+nav a:hover::after {
+  background-color: #ce2b7b;
 }
