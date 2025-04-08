@@ -99,3 +99,35 @@ input, textarea, button {
 .contact-form button:hover {
   background-color: #005fa3;
 }
+
+.projects {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
+  gap: 1.5em;
+  padding: 1em;
+}
+
+.projects article {
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 3;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 1em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 400%;
+  line-height: 1.1;
+  text-wrap: balance;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+h2 {
+  font-size: 1.25em;
+  line-height: 1.1;
+  text-wrap: balance;
+  margin: 0;
+}
