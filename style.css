@@ -1,19 +1,51 @@
+/* ===== 通用设置 ===== */
 body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
   max-width: 100ch;
-  margin-inline: max(1em, (100% - 100ch) / 2);
-  font-family: sans-serif;
+  margin-inline: auto;
+  padding: 2em 1em;
 }
 
-/* 清除 nav 的默认列表样式，让链接在一行显示 */
-nav ul,
-nav li {
-  display: contents;
+/* ===== 通用标题样式 ===== */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  text-wrap: balance;
+  margin-block: 0.5em 0.2em;
 }
 
+h1 {
+  font-size: 3em;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 0.3em;
+  margin-top: 0;
+}
+
+h2 {
+  font-size: 2em;
+  color: #333;
+  border-left: 4px solid #6c63ff;
+  padding-left: 0.5em;
+  margin-top: 2em;
+}
+
+/* ✅ 统一 h3 和 h4 样式 */
+h3, h4 {
+  font-size: 1.25em;
+  margin-top: 1em;
+  font-weight: normal;
+}
+
+/* ===== 导航栏样式 ===== */
 nav {
   display: flex;
   border-bottom: 1px solid #ccc;
   background-color: white;
+}
+
+nav ul,
+nav li {
+  display: contents;
 }
 
 nav a {
@@ -27,7 +59,6 @@ nav a {
   transition: all 0.3s ease-in-out;
 }
 
-/* 下划线（hover 或 current）效果 */
 nav a::after {
   content: '';
   position: absolute;
@@ -39,12 +70,10 @@ nav a::after {
   transition: background-color 0.3s ease-in-out;
 }
 
-/* 当前页面高亮下划线 */
 nav a.current::after {
   background-color: #adb7bb;
 }
 
-/* 鼠标悬停时的效果 */
 nav a:hover {
   background-color: #fceef5;
   color: black;
@@ -54,12 +83,11 @@ nav a:hover::after {
   background-color: #ce2b7b;
 }
 
-/* Step 3.1: 表单元素字体继承页面样式 */
+/* ===== 表单样式（Contact 页面）===== */
 input, textarea, button {
   font: inherit;
 }
 
-/* Step 3.3: 使用 CSS Grid 实现两列对齐布局 */
 .contact-form {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -68,12 +96,10 @@ input, textarea, button {
   margin: 2em auto;
 }
 
-/* 让 label 本身不占格子，仅它的内容参与布局 */
 .contact-form label {
   display: contents;
 }
 
-/* 表单控件样式 */
 .contact-form input,
 .contact-form textarea {
   width: 100%;
@@ -83,7 +109,6 @@ input, textarea, button {
   border-radius: 4px;
 }
 
-/* 提交按钮跨整行居中 */
 .contact-form button {
   grid-column: 1 / -1;
   padding: 0.75em;
@@ -100,6 +125,7 @@ input, textarea, button {
   background-color: #005fa3;
 }
 
+/* ===== Projects 页面布局 ===== */
 .projects {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
@@ -117,21 +143,7 @@ input, textarea, button {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-  font-size: 200%;
-  line-height: 1.1;
-  text-wrap: balance;
-  margin-top: 1em;
-  margin-bottom: 0.5em;
-}
-
-h2 {
-  font-size: 1.25em;
-  line-height: 1.1;
-  text-wrap: balance;
-  margin: 0;
-}
-
+/* ===== CV 页面布局 ===== */
 .cv-page .cv-layout {
   display: grid;
   grid-template-columns: 260px 1fr;
@@ -169,8 +181,8 @@ h2 {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* PDF下载按钮样式优化 */
-.cv-page a[href$=".pdf"] {
+/* ===== 下载按钮 ===== */
+a[href$=".pdf"] {
   display: inline-block;
   background-color: #007acc;
   color: white;
@@ -182,6 +194,29 @@ h2 {
   transition: background-color 0.3s ease;
 }
 
-.cv-page a[href$=".pdf"]:hover {
+a[href$=".pdf"]:hover {
   background-color: #005fa3;
+}
+
+/* ===== 其他细节 ===== */
+section article {
+  background-color: #f9f9f9;
+  padding: 1em;
+  border-radius: 8px;
+  margin-top: 1em;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+ul {
+  padding-left: 1.25em;
+  margin-top: 0.5em;
+}
+
+li {
+  margin-block: 0.25em;
+}
+
+time {
+  color: #666;
+  font-size: 0.9em;
 }
