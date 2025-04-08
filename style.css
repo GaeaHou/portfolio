@@ -1,6 +1,32 @@
 body {
-    /* Set line height to 1.5 times the font size
-         and use the OS’s UI font as the website font
-       */
-    font: 100%/1.5 system-ui;
-  }
+  max-width: 100ch;
+  margin-inline: max(1em, (100% - 100ch) / 2);
+  font-family: sans-serif;
+}
+
+/* 清除 nav 的默认列表样式，让链接在一行显示 */
+nav ul,
+nav li {
+  display: contents;
+}
+
+nav {
+  display: flex;           /* 开启 flex 布局 */
+  justify-content: space-between;  /* 可选：菜单项自动分布 */
+  background-color: #ceabec;       /* 可选：背景色 */
+  padding: 10px 0;                /* 可选：上下内边距 */
+}
+
+nav a {
+  flex: 1;                /* 每个 a 标签占相同空间 */
+  text-align: center;     /* 文字居中 */
+  text-decoration: none;  /* 去掉下划线 */
+  color: #333;            /* 文本颜色 */
+  padding: 10px;          /* 内边距 */
+}
+
+nav a.current {
+  font-weight: bold;
+  color: white;
+  background-color: #c099fa;  /* 当前菜单项高亮背景色 */
+}
