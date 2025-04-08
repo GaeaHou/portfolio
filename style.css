@@ -21,12 +21,12 @@ nav a {
   flex: 1;                /* 每个 a 标签占相同空间 */
   text-align: center;     /* 文字居中 */
   text-decoration: none;  /* 去掉下划线 */
-  color: #333;            /* 文本颜色 */
+  color: white;          /* 文本颜色 */
   padding: 10px;          /* 内边距 */
 }
 
 nav a.current {
   font-weight: bold;
   color: white;
-  background-color: #c099fa;  /* 当前菜单项高亮背景色 */
+  background-color: #ceabec;  /* 当前菜单项高亮背景色 */
 }
