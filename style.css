@@ -57,7 +57,7 @@ nav a {
   position: relative;
   font-weight: bold;
   transition: all 0.3s ease-in-out;
-  border-right: 1px solid #000;
+  border-right: 1.2px solid rgba(0, 0, 0, 0.15);
 }
 
 nav a:last-child {
