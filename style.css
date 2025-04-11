@@ -57,6 +57,11 @@ nav a {
   position: relative;
   font-weight: bold;
   transition: all 0.3s ease-in-out;
+  border-right: 1px solid #000;
+}
+
+nav a:last-child {
+  border-right: none;
 }
 
 nav a::after {
@@ -171,7 +176,7 @@ input, textarea, button {
 .cv-page main {
   display: flex;
   flex-direction: column;
-  gap: 2em;
+  gap: 1.2em;
 }
 
 .cv-page main section article {
