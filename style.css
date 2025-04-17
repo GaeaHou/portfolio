@@ -49,7 +49,7 @@ h1 {
 h2 {
   font-size: 2em;
   color: #333;
-  border-left: 4px solid #6c63ff;
+  border-left: 4px solid #6c63ff; /* 亮色模式，紫色 */
   padding-left: 0.5em;
   margin-top: 1.2em;
 }
@@ -178,7 +178,7 @@ nav a:hover::after {
 }
 
 .cv-page aside {
-  background-color: #f8f8f8; /* 亮色模式侧边栏背景，统一为background-color */
+  background-color: #f8f8f8; /* 亮色模式侧边栏背景 */
   padding: 1.5em;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
@@ -279,7 +279,6 @@ html[color-scheme="dark"] section article {
   color: #e4e4e4;
 }
 
-/* 单独处理cv-page aside，确保背景切换 */
 html[color-scheme="dark"] .cv-page aside {
   background-color: #2c3338 !important; /* 强制覆盖侧边栏背景 */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -322,10 +321,18 @@ html[color-scheme="dark"] a[href$=".pdf"]:hover {
   background-color: #2c7a56 !important;
 }
 
-/* ===== Dark mode border color for h2 in projects and cv ===== */
-html[color-scheme="dark"] .projects h2,
+/* 暗色模式下，所有h2的边框颜色切换为绿色 */
+html[color-scheme="dark"] h2 {
+  border-left: 4px solid #2c7a56 !important; /* 覆盖所有h2边框颜色 */
+}
+
+/* 保持特定页面h2的文本颜色 */
+html[color-scheme="dark"] .projects h2 {
+  color: #aac5aa; /* 项目卡片标题颜色 */
+}
+
 html[color-scheme="dark"] .cv-page h2 {
-  border-left: 4px solid #2c7a56;
+  color: #f0f0f0; /* CV页面h2标题颜色 */
 }
 
 /* ===== 媒体查询后备，确保自动模式下暗色模式样式生效 ===== */
@@ -362,7 +369,6 @@ html[color-scheme="dark"] .cv-page h2 {
       color: #e4e4e4;
     }
 
-    /* 单独处理cv-page aside，确保背景切换 */
     .cv-page aside {
       background-color: #2c3338 !important;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -408,6 +414,20 @@ html[color-scheme="dark"] .cv-page h2 {
     .color-scheme {
       background-color: rgba(30, 30, 30, 0.85) !important;
       color: white;
+    }
+
+    /* 自动模式下，所有h2的边框颜色切换为绿色 */
+    h2 {
+      border-left: 4px solid #2c7a56 !important;
+    }
+
+    /* 保持特定页面h2的文本颜色 */
+    .projects h2 {
+      color: #aac5aa;
+    }
+
+    .cv-page h2 {
+      color: #f0f0f0;
     }
   }
 }
