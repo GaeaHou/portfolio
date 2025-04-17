@@ -1,16 +1,9 @@
-console.log('IT’S ALIVE!');
+console.log("IT’S ALIVE!");
 
 // 工具函数：选择器简写
 function $$(selector, context = document) {
   return Array.from(context.querySelectorAll(selector));
 }
-
-// 激活当前页面链接高亮
-const navLinks = $$("nav a");
-let currentLink = navLinks.find(
-  (a) => a.host === location.host && a.pathname === location.pathname
-);
-currentLink?.classList.add("current");
 
 // 页面导航配置
 let pages = [
@@ -54,7 +47,14 @@ for (let p of pages) {
   nav.append(a);
 }
 
-// 🌗 创建主题切换器（自动插入 <label><select>...）
+// 当前页高亮
+const navLinks = $$("nav a");
+let currentLink = navLinks.find(
+  (a) => a.host === location.host && a.pathname === location.pathname
+);
+currentLink?.classList.add("current");
+
+// 🌗 创建主题切换器
 const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
 
 document.body.insertAdjacentHTML(
@@ -71,17 +71,24 @@ document.body.insertAdjacentHTML(
 `
 );
 
-// 💾 读取用户选择的主题
+// 💾 读取已保存的主题并应用
 const themeSelect = document.querySelector("label.color-scheme select");
 const savedTheme = localStorage.getItem("theme");
+
 if (savedTheme) {
+  document.documentElement.setAttribute("color-scheme", savedTheme);
   document.documentElement.style.colorScheme = savedTheme;
   themeSelect.value = savedTheme;
+} else {
+  // 默认设置为自动
+  document.documentElement.setAttribute("color-scheme", "light dark");
+  document.documentElement.style.colorScheme = "light dark";
 }
 
-// 🎯 监听选择变化并应用主题
+// 🎯 监听下拉选择变化
 themeSelect.addEventListener("change", (e) => {
   const theme = e.target.value;
+  document.documentElement.setAttribute("color-scheme", theme);
   document.documentElement.style.colorScheme = theme;
   localStorage.setItem("theme", theme);
 });
