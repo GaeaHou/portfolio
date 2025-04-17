@@ -1,10 +1,8 @@
 html {
   color-scheme: light dark;
-  background-color: oklch(22% 0.02 120); /* 暗色模式下为柔和浅黑 */
-  color: oklch(90% 0.01 140);            /* 柔白微灰绿 */
 }
 
-/* ===== 通用设置 ===== */
+/* ===== 通用设置（两种模式共用） ===== */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
@@ -13,7 +11,6 @@ body {
   padding: 2em 1em;
 }
 
-/* ===== 通用标题样式 ===== */
 h1, h2, h3, h4, h5, h6 {
   line-height: 1.2;
   text-wrap: balance;
@@ -22,16 +19,12 @@ h1, h2, h3, h4, h5, h6 {
 
 h1 {
   font-size: 3em;
-  border-bottom: 2px solid #ccc;
   padding-bottom: 0.3em;
   margin-top: 0;
 }
 
 h2 {
   font-size: 2em;
-  color: #333;
-  border-left: 4px solid #6c63ff;
-  padding-left: 0.5em;
   margin-top: 1.2em;
 }
 
@@ -41,16 +34,12 @@ h3, h4 {
   font-weight: normal;
 }
 
-/* ===== 导航栏样式 ===== */
 nav {
-  --border-color: oklch(55% 0.12 160 / 30%);
   display: flex;
   border-bottom: 1px solid var(--border-color);
-  background-color: oklch(30% 0.06 160); /* 墨绿导航栏 */
 }
 
-nav ul,
-nav li {
+nav ul, nav li {
   display: contents;
 }
 
@@ -59,11 +48,9 @@ nav a {
   text-align: center;
   text-decoration: none;
   padding: 16px 0;
-  color: oklch(95% 0.02 140);
   position: relative;
   font-weight: bold;
   transition: all 0.3s ease-in-out;
-  border-right: 1px solid oklch(45% 0.05 160 / 30%);
 }
 
 nav a:last-child {
@@ -82,19 +69,14 @@ nav a::after {
 }
 
 nav a.current::after {
-  background-color: oklch(65% 0.15 160); /* 当前页指示线 */
-}
-
-nav a:hover {
-  background-color: oklch(35% 0.08 160); /* hover 背景绿色柔化 */
-  color: oklch(98% 0.01 140);
+  background-color: var(--accent-line);
 }
 
 nav a:hover::after {
-  background-color: oklch(70% 0.12 160);
+  background-color: var(--hover-line);
 }
 
-/* ===== 主题切换器样式 ===== */
+/* ===== 通用组件：主题切换器 ===== */
 .color-scheme {
   position: absolute;
   top: 1rem;
@@ -107,8 +89,8 @@ nav a:hover::after {
 
 .color-scheme select {
   font: inherit;
-  background-color: oklch(25% 0.02 130);
-  color: oklch(90% 0.02 140);
+  background-color: transparent;
+  color: inherit;
   border: 1px solid var(--border-color);
   border-radius: 4px;
   padding: 0.3em;
@@ -118,7 +100,7 @@ nav a:hover::after {
   font-family: system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
 }
 
-/* ===== 表单样式（Contact 页面）===== */
+/* ===== 表单 ===== */
 input, textarea, button {
   font: inherit;
 }
@@ -135,34 +117,7 @@ input, textarea, button {
   display: contents;
 }
 
-.contact-form input,
-.contact-form textarea {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.5em;
-  background-color: oklch(25% 0.02 130);
-  color: oklch(92% 0.01 140);
-  border: 1px solid oklch(50% 0.04 140);
-  border-radius: 4px;
-}
-
-.contact-form button {
-  grid-column: 1 / -1;
-  padding: 0.75em;
-  background-color: oklch(40% 0.1 160);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.contact-form button:hover {
-  background-color: oklch(55% 0.12 160);
-}
-
-/* ===== Projects 页面布局 ===== */
+/* ===== Projects 页 ===== */
 .projects {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
@@ -170,33 +125,12 @@ input, textarea, button {
   padding: 1em;
 }
 
-.projects article {
-  display: grid;
-  grid-template-rows: subgrid;
-  grid-row: span 3;
-  background-color: oklch(26% 0.02 120);
-  color: oklch(92% 0.01 140);
-  border-radius: 8px;
-  padding: 1em;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* ===== CV 页面布局 ===== */
+/* ===== CV 页面 ===== */
 .cv-page .cv-layout {
   display: grid;
   grid-template-columns: 1fr 260px;
   gap: 2em;
   margin-top: 2em;
-}
-
-.cv-page aside {
-  background: oklch(28% 0.03 130);
-  color: oklch(90% 0.01 140);
-  padding: 1.5em;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  text-align: center;
-  height: fit-content;
 }
 
 .cv-page aside img {
@@ -213,18 +147,9 @@ input, textarea, button {
   gap: 1.2em;
 }
 
-.cv-page main section article {
-  background-color: oklch(26% 0.02 120);
-  color: oklch(92% 0.01 140);
-  padding: 1em;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
-
 /* ===== 下载按钮 ===== */
 a[href$=".pdf"] {
   display: inline-block;
-  background-color: oklch(40% 0.1 160);
   color: white;
   padding: 0.75em 1.5em;
   border-radius: 4px;
@@ -234,20 +159,17 @@ a[href$=".pdf"] {
   transition: background-color 0.3s ease;
 }
 
-a[href$=".pdf"]:hover {
-  background-color: oklch(55% 0.12 160);
-}
-
-/* ===== 其他细节 ===== */
-section article {
-  background-color: oklch(26% 0.02 120);
-  color: oklch(92% 0.01 140);
+/* ===== 通用卡片类 ===== */
+section article,
+.projects article,
+.cv-page aside,
+.cv-page main section article {
   padding: 1em;
   border-radius: 8px;
   margin-top: 1em;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
+/* ===== 通用列表/时间 ===== */
 ul {
   padding-left: 1.25em;
   margin-top: 0.5em;
@@ -258,6 +180,127 @@ li {
 }
 
 time {
-  color: oklch(70% 0.01 140);
   font-size: 0.9em;
+}
+
+/* ===== 🌞 Light Mode ===== */
+@media (prefers-color-scheme: light) {
+  html {
+    background-color: white;
+    color: black;
+  }
+
+  nav {
+    background-color: white;
+    --border-color: oklch(80% 3% 200 / 40%);
+    --accent-line: #ce2b7b;
+    --hover-line: #ce2b7b;
+  }
+
+  nav a {
+    color: black;
+    border-right: 1px solid rgba(0, 0, 0, 0.15);
+  }
+
+  nav a:hover {
+    background-color: color-mix(in oklch, #fceef5, white 85%);
+  }
+
+  h2 {
+    color: #333;
+    border-left: 4px solid #6c63ff;
+    padding-left: 0.5em;
+  }
+
+  .projects article,
+  .cv-page aside,
+  .cv-page main section article,
+  section article {
+    background-color: #f9f9f9;
+    color: black;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    background-color: white;
+    color: black;
+    border: 1px solid #ccc;
+  }
+
+  .contact-form button,
+  a[href$=".pdf"] {
+    background-color: #007acc;
+  }
+
+  .contact-form button:hover,
+  a[href$=".pdf"]:hover {
+    background-color: #005fa3;
+  }
+
+  time {
+    color: #666;
+  }
+}
+
+/* ===== 🌚 Dark Mode ===== */
+@media (prefers-color-scheme: dark) {
+  html {
+    background-color: oklch(22% 0.02 120);
+    color: oklch(90% 0.01 140);
+  }
+
+  nav {
+    background-color: oklch(30% 0.06 160);
+    --border-color: oklch(55% 0.12 160 / 30%);
+    --accent-line: oklch(65% 0.15 160);
+    --hover-line: oklch(70% 0.12 160);
+  }
+
+  nav a {
+    color: oklch(95% 0.02 140);
+    border-right: 1px solid oklch(45% 0.05 160 / 30%);
+  }
+
+  nav a:hover {
+    background-color: oklch(35% 0.08 160);
+    color: oklch(98% 0.01 140);
+  }
+
+  h2 {
+    color: oklch(92% 0.02 140);
+    border-left: 4px solid oklch(65% 0.15 160);
+    padding-left: 0.5em;
+  }
+
+  .projects article,
+  .cv-page aside,
+  .cv-page main section article,
+  section article {
+    background-color: oklch(26% 0.02 120);
+    color: oklch(92% 0.01 140);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    background-color: oklch(25% 0.02 130);
+    color: oklch(92% 0.01 140);
+    border: 1px solid oklch(50% 0.04 140);
+  }
+
+  .contact-form button,
+  a[href$=".pdf"] {
+    background-color: oklch(40% 0.1 160);
+    color: white;
+  }
+
+  .contact-form button:hover,
+  a[href$=".pdf"]:hover {
+    background-color: oklch(55% 0.12 160);
+  }
+
+  time {
+    color: oklch(70% 0.01 140);
+  }
 }
