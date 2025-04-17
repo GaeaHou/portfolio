@@ -294,12 +294,6 @@ html[color-scheme="dark"] a[href$=".pdf"]:hover {
   background-color: #2c7a56;
 }
 
-/* ===== Dark mode border color for h2 in projects and cv ===== */
-html[color-scheme="dark"] .projects h2,
-html[color-scheme="dark"] .cv-page h2 {
-  border-left: 4px solid #6fd39e;
-}
-
 /* ===== 主题切换器右上角样式 ===== */
 .color-scheme {
   position: absolute;
@@ -318,4 +312,32 @@ html[color-scheme="dark"] .cv-page h2 {
 html[color-scheme="dark"] .color-scheme {
   background-color: rgba(30, 30, 30, 0.85);
   color: white;
+}
+
+/* ===== 统一卡片样式（Projects / CV / 通用） ===== */
+.card {
+  background-color: #f9f9f9;
+  padding: 1em;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+html[color-scheme="dark"] .card {
+  background-color: #2c3338;
+  color: #e4e4e4;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== 卡片标题统一样式 ===== */
+.card-title {
+  font-size: 1.5em;
+  margin: 0.5em 0;
+  color: #222;
+  border-left: 4px solid #6c63ff;
+  padding-left: 0.5em;
+}
+
+html[color-scheme="dark"] .card-title {
+  color: #f0f0f0;
+  border-left: 4px solid #4fc3a1;
 }
