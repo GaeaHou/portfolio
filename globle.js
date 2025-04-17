@@ -66,20 +66,34 @@ document.body.insertAdjacentHTML(
   `
   );
   
-  const select = document.querySelector(".color-scheme select");
-  
-  function setColorScheme(scheme) {
-    document.documentElement.style.setProperty("color-scheme", scheme);
-    localStorage.colorScheme = scheme;
-    select.value = scheme;
-  }
-  
-  // 应用用户保存的主题
-  if ("colorScheme" in localStorage) {
-    setColorScheme(localStorage.colorScheme);
-  }
-  
-  // 监听用户切换
-  select.addEventListener("input", (event) => {
-    setColorScheme(event.target.value);
-  });
+document.body.insertAdjacentHTML(
+  "afterbegin",
+  `
+  <label class="color-scheme">
+    Theme:
+    <select>
+      <option value="light dark">Automatic</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
+  </label>
+`
+);
+
+const select = document.querySelector(".color-scheme select");
+
+function setColorScheme(scheme) {
+  document.documentElement.style.setProperty("color-scheme", scheme);
+  localStorage.colorScheme = scheme;
+  select.value = scheme;
+}
+
+// 应用用户保存的主题
+if ("colorScheme" in localStorage) {
+  setColorScheme(localStorage.colorScheme);
+}
+
+// 监听用户切换
+select.addEventListener("input", (event) => {
+  setColorScheme(event.target.value);
+});
