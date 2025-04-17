@@ -5,6 +5,11 @@ html {
   color: canvastext;
 }
 
+html[color-scheme="dark"] {
+  background-color: #1a1a1a; /* 暗色模式背景 */
+  color: #b3ff99; /* 暗色模式文本 */
+}
+
 /* ===== 通用设置 ===== */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
