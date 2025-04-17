@@ -263,9 +263,7 @@ html[color-scheme="dark"] nav a:hover::after {
 }
 
 html[color-scheme="dark"] .projects article,
-html[color-scheme="dark"] .projects article h2 {
-  color: #bac6ba; /* 亮绿色，与黑绿配色高亮一致 */
-}
+
 html[color-scheme="dark"] .cv-page main section article,
 html[color-scheme="dark"] .cv-page aside,
 html[color-scheme="dark"] section article {
