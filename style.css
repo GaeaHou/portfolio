@@ -1,3 +1,4 @@
+/* ===== 基本设置（亮暗通用） ===== */
 html {
   color-scheme: light dark;
   background-color: canvas;
@@ -35,7 +36,6 @@ h2 {
   margin-top: 1.2em;
 }
 
-/* ✅ 统一 h3 和 h4 样式 */
 h3, h4 {
   font-size: 1.25em;
   margin-top: 1em;
@@ -45,10 +45,6 @@ h3, h4 {
 /* ===== 导航栏样式 ===== */
 nav {
   display: flex;
-  border-bottom: 1px solid #ccc;
-  background-color: white;
-}
-nav {
   --border-color: oklch(50% 10% 200 / 40%);
   border-bottom: 1px solid var(--border-color);
   background-color: white;
@@ -235,4 +231,60 @@ li {
 time {
   color: #666;
   font-size: 0.9em;
+}
+
+/* ===== 🌙 暗色模式 ===== */
+@media (prefers-color-scheme: dark) {
+  html {
+    background-color: #1b1f23;
+    color: #e4e4e4;
+  }
+
+  nav {
+    background-color: #2a2f33;
+    --border-color: oklch(50% 10% 140 / 30%);
+  }
+
+  nav a {
+    color: #d1ffd1;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  nav a.current::after {
+    background-color: #6fd39e;
+  }
+
+  nav a:hover {
+    background-color: color-mix(in oklch, #6fd39e, canvas 85%);
+    color: white;
+  }
+
+  nav a:hover::after {
+    background-color: #9fffc0;
+  }
+
+  .projects article,
+  .cv-page main section article,
+  .cv-page aside,
+  section article {
+    background-color: #2c3338;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    background-color: #2e333a;
+    color: #e4e4e4;
+    border: 1px solid #444;
+  }
+
+  .contact-form button,
+  a[href$=".pdf"] {
+    background-color: #37996b;
+  }
+
+  .contact-form button:hover,
+  a[href$=".pdf"]:hover {
+    background-color: #2c7a56;
+  }
 }
