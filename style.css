@@ -245,7 +245,7 @@ html[color-scheme="dark"] nav {
 }
 
 html[color-scheme="dark"] nav a {
-  color: #d1ffd1;
+  color: #e4e4e4;
   border-right: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -259,7 +259,7 @@ html[color-scheme="dark"] nav a:hover {
 }
 
 html[color-scheme="dark"] nav a:hover::after {
-  background-color: #9fffc0;
+  background-color: #2c7a56;
 }
 
 html[color-scheme="dark"] .projects article,
@@ -297,7 +297,7 @@ html[color-scheme="dark"] a[href$=".pdf"]:hover {
 /* ===== Dark mode border color for h2 in projects and cv ===== */
 html[color-scheme="dark"] .projects h2,
 html[color-scheme="dark"] .cv-page h2 {
-  border-left: 4px solid #6fd39e;
+  border-left: 4px solid #2c7a56;
 }
 
 /* ===== 主题切换器右上角样式 ===== */
