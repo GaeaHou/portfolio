@@ -155,6 +155,10 @@ nav a:hover::after {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
+html[color-scheme="dark"] .projects article h2 {
+  color: #aac5aa; /* 亮绿色，与黑绿配色高亮一致 */
+}
+
 /* ===== CV 页面布局 ===== */
 .cv-page .cv-layout {
   display: grid;
@@ -263,7 +267,6 @@ html[color-scheme="dark"] nav a:hover::after {
 }
 
 html[color-scheme="dark"] .projects article,
-
 html[color-scheme="dark"] .cv-page main section article,
 html[color-scheme="dark"] .cv-page aside,
 html[color-scheme="dark"] section article {
