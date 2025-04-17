@@ -301,6 +301,11 @@ html[color-scheme="dark"] .cv-page h2 {
   border-left: 4px solid #00cc00;
 }
 
+/* ===== 暗色模式下时间标签的颜色调整 ===== */
+html[color-scheme="dark"] time {
+  color: #99cc99;
+}
+
 /* ===== 主题切换器样式 ===== */
 .color-scheme {
   position: absolute;
