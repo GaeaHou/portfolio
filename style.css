@@ -295,7 +295,7 @@ html[color-scheme="dark"] .cv-page h2 {
 }
 
 html[color-scheme="dark"] .projects article h2 {
-  color: #aac5aa; /* 项目卡片标题颜色 */
+  color: #f0f0f0; /* 项目卡片标题颜色 */
 }
 
 html[color-scheme="dark"] .contact-form input,

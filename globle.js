@@ -92,3 +92,26 @@ themeSelect.addEventListener("change", (e) => {
   document.documentElement.style.colorScheme = theme;
   localStorage.setItem("theme", theme);
 });
+
+// 📧 改进联系表单
+const form = document.querySelector("form.contact-form");
+form?.addEventListener("submit", function (event) {
+  event.preventDefault(); // 阻止默认表单提交
+
+  const data = new FormData(form);
+  let url = form.action + "?"; // 获取mailto:地址，例如mailto:xuebinghou60@gmail.com
+  const params = [];
+
+  // 遍历表单字段，编码值并构建URL参数
+  for (let [name, value] of data) {
+    const encodedValue = encodeURIComponent(value);
+    params.push(`${name}=${encodedValue}`);
+    console.log(name, encodedValue); // 调试：查看编码后的值
+  }
+
+  // 拼接参数到URL
+  url += params.join("&");
+
+  // 打开邮件客户端
+  location.href = url;
+});
