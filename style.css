@@ -1,3 +1,9 @@
+html {
+  color-scheme: light dark;
+  background-color: canvas;
+  color: canvastext;
+}
+
 /* ===== 通用设置 ===== */
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -38,8 +44,9 @@ h3, h4 {
 
 /* ===== 导航栏样式 ===== */
 nav {
+  --border-color: oklch(50% 10% 200 / 40%);
   display: flex;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid var(--border-color);
   background-color: white;
 }
 
@@ -80,12 +87,32 @@ nav a.current::after {
 }
 
 nav a:hover {
-  background-color: #fceef5;
+  background-color: color-mix(in oklch, #fceef5, canvas 85%);
   color: black;
 }
 
 nav a:hover::after {
   background-color: #ce2b7b;
+}
+
+/* ===== 主题切换器样式 ===== */
+.color-scheme {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 0.8rem;
+  font-family: inherit;
+  background-color: transparent;
+  color: inherit;
+}
+
+.color-scheme select {
+  font: inherit;
+  background-color: transparent;
+  color: inherit;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.3em;
 }
 
 /* ===== 表单样式（Contact 页面）===== */
