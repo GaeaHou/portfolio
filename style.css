@@ -68,6 +68,7 @@ nav {
   background-color: #ffffff; /* 亮色模式背景 */
 }
 
+
 nav ul,
 nav li {
   display: contents;
@@ -260,6 +261,10 @@ html[color-scheme="dark"] nav a {
 
 html[color-scheme="dark"] nav a.current::after {
   background-color: #6fd39e;
+}
+
+html[color-scheme="dark"] nav a:last-child {
+  border-right: none !important; /* 暗色模式下移除最后一个链接的分割线 */
 }
 
 html[color-scheme="dark"] nav a:hover {
