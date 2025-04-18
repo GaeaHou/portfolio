@@ -255,7 +255,7 @@ html[color-scheme="dark"] nav {
 
 html[color-scheme="dark"] nav a {
   color: #e4e4e4;
-  border-right: 1px solid rgba(255, 255, 0.1);
+  border-right: 1px solid #e4e4e4;
 }
 
 html[color-scheme="dark"] nav a.current::after {
