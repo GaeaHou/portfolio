@@ -132,7 +132,11 @@ export async function fetchJSON(url) {
   }
 }
 
-export function renderProjects(project, containerElement, headingLevel = 'h2') {
+export function renderProjects(projects, containerElement, headingLevel = 'h2') {
+  if (!Array.isArray(projects)) {
+    console.error('Invalid projects data');
+    return;
+  }
 
   if (!containerElement || !(containerElement instanceof HTMLElement)) {
     console.error('Invalid containerElement');
@@ -147,13 +151,18 @@ export function renderProjects(project, containerElement, headingLevel = 'h2') {
 
   containerElement.innerHTML = '';
 
-  const article = document.createElement('article');
+  if (projects.length === 0) {
+    containerElement.innerHTML = `<p>No projects to display.</p>`;
+    return;
+  }
 
-  article.innerHTML = `
-    <${headingLevel}>${project.title || 'Untitled Project'}</${headingLevel}>
-    <img src="${project.image || 'placeholder.jpg'}" alt="${project.title || 'Project Image'}">
-    <p>${project.description || 'No description available.'}</p>
-  `;
-
-  containerElement.appendChild(article);
+  for (const project of projects) {
+    const article = document.createElement('article');
+    article.innerHTML = `
+      <${headingLevel}>${project.title || 'Untitled Project'}</${headingLevel}>
+      <img src="${project.image || '#'}" alt="${project.title || 'Project Image'}">
+      <p>${project.description || 'No description provided.'}</p>
+    `;
+    containerElement.appendChild(article);
+  }
 }
