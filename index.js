@@ -6,7 +6,7 @@ const projectsContainer = document.querySelector('.projects');
 renderProjects(latestProjects, projectsContainer, 'h2');
 
 
-const githubData = await fetchGitHubData('your-github-username'); // 换成你的用户名
+const githubData = await fetchGitHubData('Xuebing Hou');
 
 const profileStats = document.querySelector('#profile-stats');
 if (profileStats) {
