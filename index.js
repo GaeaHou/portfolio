@@ -6,7 +6,7 @@ const projectsContainer = document.querySelector('.projects');
 renderProjects(latestProjects, projectsContainer, 'h2');
 
 
-const githubData = await fetchGithubData('Xuebing Hou');
+const githubData = await fetchGithubData('gaeahou');
 
 const profileStats = document.querySelector('#profile-stats');
 if (profileStats) {
