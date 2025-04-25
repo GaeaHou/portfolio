@@ -248,6 +248,40 @@ time {
   font-size: 0.9em;
 }
 
+.github-stats-card {
+  max-width: 800px;
+  margin: 2em auto;
+  padding: 1em 2em;
+  border-left: 4px solid #7a6ff0;
+  background: #fff;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  border-radius: 8px;
+}
+
+.github-title {
+  font-size: 1.8em;
+  font-weight: bold;
+  margin-bottom: 1em;
+}
+
+.github-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1em;
+  text-align: center;
+}
+
+.github-grid .label {
+  font-size: 0.85em;
+  color: #777;
+  letter-spacing: 0.5px;
+}
+
+.github-grid .value {
+  font-size: 2em;
+  font-weight: bold;
+  margin-top: 0.2em;
+}
 /* ===== 🌙 暗色模式样式 ===== */
 html[color-scheme="dark"] nav {
   background-color: #2a2f33 !important; /* 强制覆盖导航栏背景 */

@@ -9,14 +9,26 @@ renderProjects(latestProjects, projectsContainer, 'h2');
 const githubData = await fetchGithubData('gaeahou');
 
 const profileStats = document.querySelector('#profile-stats');
-if (profileStats) {
+if (profileStats && githubData) {
   profileStats.innerHTML = `
-    <h2>GitHub Profile Stats</h2>
-    <dl>
-      <dt>Public Repos:</dt><dd>${githubData.public_repos}</dd>
-      <dt>Public Gists:</dt><dd>${githubData.public_gists}</dd>
-      <dt>Followers:</dt><dd>${githubData.followers}</dd>
-      <dt>Following:</dt><dd>${githubData.following}</dd>
-    </dl>
+    <h2 class="github-title">My GitHub Stats</h2>
+    <div class="github-grid">
+      <div>
+        <span class="label">FOLLOWERS</span>
+        <div class="value">${githubData.followers}</div>
+      </div>
+      <div>
+        <span class="label">FOLLOWING</span>
+        <div class="value">${githubData.following}</div>
+      </div>
+      <div>
+        <span class="label">PUBLIC REPOS</span>
+        <div class="value">${githubData.public_repos}</div>
+      </div>
+      <div>
+        <span class="label">PUBLIC GISTS</span>
+        <div class="value">${githubData.public_gists}</div>
+      </div>
+    </div>
   `;
 }
