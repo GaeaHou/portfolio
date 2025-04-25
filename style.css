@@ -374,6 +374,10 @@ html[color-scheme="dark"] .cv-page h2 {
   color: #f0f0f0; /* CV页面h2标题颜色 */
 }
 
+html[color-scheme="dark"] h2 {
+  color: #f0f0f0 !important;
+  border-left: 4px solid #2c7a56 !important;
+}
 /* ===== 媒体查询后备，确保自动模式下暗色模式样式生效 ===== */
 @media (prefers-color-scheme: dark) {
   html:not([color-scheme="light"]) { /* 避免覆盖手动选择light模式 */
