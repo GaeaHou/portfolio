@@ -117,6 +117,21 @@ form?.addEventListener("submit", function (event) {
 });
 
 
+export async function fetchJSON(url) {
+  try {
+    // Fetch the JSON file from the given URL
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch projects: ${response.statusText}`);
+    }
+    console.log(response)
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching or parsing JSON data:', error);
+  }
+}
+
 export function renderProjects(projects, containerElement, headingLevel = 'h2') {
   if (!Array.isArray(projects)) {
     console.error('Invalid projects data');
@@ -143,17 +158,15 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
 
   for (const project of projects) {
     const article = document.createElement('article');
-    
-    // 如果有 link，就让图片变成可点击
-    const imageElement = project.link
-      ? `<a href="${project.link}" target="_blank"><img src="${project.image || '#'}" alt="${project.title || 'Project Image'}"></a>`
-      : `<img src="${project.image || '#'}" alt="${project.title || 'Project Image'}">`;
-
     article.innerHTML = `
       <${headingLevel}>${project.title || 'Untitled Project'}</${headingLevel}>
-      ${imageElement}
+      <img src="${project.image || '#'}" alt="${project.title || 'Project Image'}">
       <p>${project.description || 'No description provided.'}</p>
     `;
     containerElement.appendChild(article);
   }
+}
+
+export async function fetchGithubData(username) {
+  return fetchJSON(`https://api.github.com/users/${username}`);
 }
