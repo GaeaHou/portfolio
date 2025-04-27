@@ -143,22 +143,11 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
     return;
   }
 
-  const validHeadings = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-  if (!validHeadings.includes(headingLevel)) {
-    console.warn(`Invalid headingLevel "${headingLevel}", defaulting to h2`);
-    headingLevel = 'h2';
-  }
-
   containerElement.innerHTML = '';
-
-  if (projects.length === 0) {
-    containerElement.innerHTML = `<p>No projects to display.</p>`;
-    return;
-  }
 
   for (const project of projects) {
     const article = document.createElement('article');
-    article.classList.add('project-card');  // 加上类名
+    article.classList.add('project-card');
 
     const heading = document.createElement(headingLevel);
     heading.textContent = project.title || 'Untitled Project';
@@ -166,7 +155,7 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
     const image = document.createElement('img');
     image.src = project.image || '#';
     image.alt = project.title || 'Project Image';
-    image.classList.add('project-image');  // 给图片加类
+    image.classList.add('project-image');  // ✅加这一行，给图片加上正确class！
 
     const description = document.createElement('p');
     description.textContent = project.description || 'No description provided.';
