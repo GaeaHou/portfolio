@@ -158,11 +158,31 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
 
   for (const project of projects) {
     const article = document.createElement('article');
-    article.innerHTML = `
-      <${headingLevel}>${project.title || 'Untitled Project'}</${headingLevel}>
-      <img src="${project.image || '#'}" alt="${project.title || 'Project Image'}">
-      <p>${project.description || 'No description provided.'}</p>
-    `;
+    article.classList.add('project-card');  // 加上类名
+
+    const heading = document.createElement(headingLevel);
+    heading.textContent = project.title || 'Untitled Project';
+
+    const image = document.createElement('img');
+    image.src = project.image || '#';
+    image.alt = project.title || 'Project Image';
+    image.classList.add('project-image');  // 给图片加类
+
+    const description = document.createElement('p');
+    description.textContent = project.description || 'No description provided.';
+
+    if (project.link) {
+      const link = document.createElement('a');
+      link.href = project.link;
+      link.target = "_blank";
+      link.appendChild(image);
+      article.appendChild(link);
+    } else {
+      article.appendChild(image);
+    }
+
+    article.appendChild(heading);
+    article.appendChild(description);
     containerElement.appendChild(article);
   }
 }
