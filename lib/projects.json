@@ -1,5 +1,12 @@
 [
     {
+        "title": "Global Gender Gap in Primary Education",
+        "year": "2025",
+        "image": "/portfolio/projects/1.png",
+        "description": "This project explores how visualizations reveal or obscure gender gaps in global primary education using world maps and enrollment trend analysis.",
+        "link": "/portfolio/projects/project2_report.html"
+    },
+    {
         "title": "Lorem ipsum dolor sit.",
         "year": "2024",
         "image": "https://vis-society.github.io/labs/2/images/empty.svg",
