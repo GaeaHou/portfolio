@@ -155,9 +155,9 @@ nav a:hover::after {
 /* ===== Projects 页面布局 ===== */
 .projects {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* 三列排版，最小280px */
-  gap: 1.5rem; /* 卡片之间的空隙 */
-  padding: 2rem 0;
+  grid-template-columns: repeat(auto-fill, minmax(15em, 1fr)); /* 三列排版，最小280px */
+  gap: 1.5em; /* 卡片之间的空隙 */
+  padding: 1em ;
 }
 
 .projects article {
