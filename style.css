@@ -197,6 +197,11 @@ nav a:hover::after {
   color: #555;
 }
 
+.project-card {
+  width: 90%; /* 每张卡片不要太宽 */
+  max-width: 300px; /* 控制最大宽度，避免太胖 */
+}
+
 /* ===== CV 页面布局 ===== */
 .cv-page .cv-layout {
   display: grid;
