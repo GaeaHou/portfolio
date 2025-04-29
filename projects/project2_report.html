@@ -184,11 +184,31 @@
       <section>
         <h3>Interactive Exploration: Gender Gaps by Country</h3>
         <p>
-          Use the dropdown below to explore how gender gaps in primary school enrollment changed from 2000 to 2020 across different countries.
-          This tool lets you interactively explore the dataset used in the FOR visualization.
+          Use the button below to toggle an interactive visualization of gender gap trends in primary school enrollment (2000–2020) for different countries.  
+          Due to data availability, some countries may appear with incomplete or missing data in the chart.
         </p>
-        <iframe src="/portfolio/projects/total_data.html"
-                width="100%" height="550" style="border: none; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);"></iframe>
+      
+        <button onclick="toggleChart()" style="padding: 0.5rem 1rem; border-radius: 5px; background-color: #4682B4; color: white; border: none; cursor: pointer;">
+          Show Interactive Chart
+        </button>
+      
+        <div id="interactiveChart" style="margin-top: 1rem; display: none;">
+          <iframe src="/portfolio/projects/total_data.html"
+                  width="100%" height="550"
+                  style="border: none; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+          </iframe>
+        </div>
+      
+        <script>
+          let chartVisible = false;
+          function toggleChart() {
+            const chartDiv = document.getElementById('interactiveChart');
+            const button = event.currentTarget;
+            chartVisible = !chartVisible;
+            chartDiv.style.display = chartVisible ? 'block' : 'none';
+            button.textContent = chartVisible ? 'Hide Interactive Chart' : 'Show Interactive Chart';
+          }
+        </script>
       </section>
 
       <section>
