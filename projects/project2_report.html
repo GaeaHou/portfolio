@@ -211,12 +211,7 @@
           Show Interactive Chart
         </button>
       
-        <div id="interactiveChart" style="margin-top: 1rem; display: none;">
-          <iframe src="/portfolio/projects/interactive_gender_gap.html"
-                  width="100%" height="550"
-                  style="border: none; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
-          </iframe>
-        </div>
+        <div id="interactiveChart" style="margin-top: 1rem; display: none;"></div>
       
         <script>
           let chartVisible = false;
@@ -224,8 +219,22 @@
             const chartDiv = document.getElementById('interactiveChart');
             const button = event.currentTarget;
             chartVisible = !chartVisible;
-            chartDiv.style.display = chartVisible ? 'block' : 'none';
-            button.textContent = chartVisible ? 'Hide Interactive Chart' : 'Show Interactive Chart';
+      
+            if (chartVisible) {
+              // 重新插入 iframe
+              chartDiv.innerHTML = `
+                <iframe src="/portfolio/projects/interactive_gender_gap.html"
+                        width="100%" height="550"
+                        style="border: none; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                </iframe>`;
+              chartDiv.style.display = 'block';
+              button.textContent = 'Hide Interactive Chart';
+            } else {
+              // 清除 iframe
+              chartDiv.innerHTML = '';
+              chartDiv.style.display = 'none';
+              button.textContent = 'Show Interactive Chart';
+            }
           }
         </script>
       </section>
