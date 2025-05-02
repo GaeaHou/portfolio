@@ -216,6 +216,14 @@ nav a:hover::after {
   text-align: left; /* 明确左对齐，尽管默认是这样 */
 }
 
+#projects-pie-plot {
+  max-width: 20em;
+  margin-block: 2em;
+  overflow: visible;
+}
+
+
+
 /* ===== CV 页面布局 ===== */
 .cv-page .cv-layout {
   display: grid;
