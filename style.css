@@ -222,6 +222,31 @@ nav a:hover::after {
   overflow: visible;
 }
 
+.legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9em, 1fr));
+  gap: 1em;
+  border: 1px solid #ccc;
+  padding: 1em;
+  margin-top: 1em;
+  list-style: none;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.legend-item .swatch {
+  width: 1em;
+  height: 1em;
+  aspect-ratio: 1 / 1;
+  background-color: var(--color);
+  border-radius: 3px;
+  display: inline-block;
+}
+
 
 
 /* ===== CV 页面布局 ===== */
