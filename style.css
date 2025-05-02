@@ -216,37 +216,46 @@ nav a:hover::after {
   text-align: left; /* 明确左对齐，尽管默认是这样 */
 }
 
+.container {
+  display: flex;
+  align-items: flex-start;   /* 或 center */
+  gap: 2em;                  /* 控制图和图例间距 */
+  flex-wrap: wrap;           /* 小屏幕自动换行，响应式 */
+  margin-top: 2em;
+}
+
 #projects-plot {
+  flex-shrink: 0;            /* 图不要被压缩 */
   max-width: 20em;
-  margin-block: 2em;
-  overflow: visible;
+  height: auto;
 }
 
 .legend {
+  flex: 1;                   /* 占据剩余空间 */
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(7.5em, 1fr));
-  gap: 0.8em;
-  border: 1px solid #ccc;
-  padding: 1em;
-  margin-top: 1em;
+  grid-template-columns: repeat(auto-fill, minmax(8em, 1fr));
+  gap: 0.4em 0.8em;
+  font-size: 0.85em;
   list-style: none;
-  font-size: 0.85em; 
+  padding: 1em;
+  border: 1px solid #ccc;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.3em;
+  gap: 0.4em;
 }
 
 .legend-item .swatch {
-  width: 0.9em;
-  height: 0.9em;
-  aspect-ratio: 1 / 1;
-  background-color: var(--color);
+  width: 0.8em;
+  height: 0.8em;
   border-radius: 3px;
+  background-color: var(--color);
   display: inline-block;
 }
+
+
 
 
 
