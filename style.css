@@ -210,8 +210,10 @@ nav a:hover::after {
   color: gray;
   font-family: Baskerville, serif;
   font-variant-numeric: oldstyle-nums;
-  margin-top: 0.25em;
+  font-style: italic;
   font-size: 0.9em;
+  margin-top: 0.4em;
+  text-align: left; /* 明确左对齐，尽管默认是这样 */
 }
 
 /* ===== CV 页面布局 ===== */

@@ -177,8 +177,8 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
     description.textContent = project.description || 'No description provided.';
   
     const year = document.createElement('p');
-    year.textContent = project.year || 'Year Unknown';
-    year.classList.add('project-year');  // 用于样式
+    year.textContent = `c. ${project.year || 'Year Unknown'}`;
+    year.classList.add('project-year');
   
     infoWrapper.appendChild(description);
     infoWrapper.appendChild(year);
