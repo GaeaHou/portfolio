@@ -19,7 +19,7 @@ let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
 let sliceGenerator = d3.pie();
 let arcData = sliceGenerator(data);
 
-arcs.forEach((d, idx) => {
+arcData.forEach((d, idx) => {
   d3.select('#projects-plot')
     .append('path')
     .attr('d', arcGenerator(d))
