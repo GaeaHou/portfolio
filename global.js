@@ -148,18 +148,15 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
   for (const project of projects) {
     const article = document.createElement('article');
     article.classList.add('project-card');
-
+  
     const heading = document.createElement(headingLevel);
     heading.textContent = project.title || 'Untitled Project';
-
+  
     const image = document.createElement('img');
     image.src = project.image || '#';
     image.alt = project.title || 'Project Image';
-    image.classList.add('project-image');  // ✅加这一行，给图片加上正确class！
-
-    const description = document.createElement('p');
-    description.textContent = project.description || 'No description provided.';
-
+    image.classList.add('project-image');
+  
     if (project.link) {
       const link = document.createElement('a');
       link.href = project.link;
@@ -169,13 +166,27 @@ export function renderProjects(projects, containerElement, headingLevel = 'h2') 
     } else {
       article.appendChild(image);
     }
-
+  
     article.appendChild(heading);
-    article.appendChild(description);
+  
+    // ✅ 新建一个div包裹描述+年份
+    const infoWrapper = document.createElement('div');
+    infoWrapper.classList.add('project-info');
+  
+    const description = document.createElement('p');
+    description.textContent = project.description || 'No description provided.';
+  
+    const year = document.createElement('p');
+    year.textContent = project.year || 'Year Unknown';
+    year.classList.add('project-year');  // 用于样式
+  
+    infoWrapper.appendChild(description);
+    infoWrapper.appendChild(year);
+    article.appendChild(infoWrapper);
+  
     containerElement.appendChild(article);
   }
 }
-
 export async function fetchGithubData(username) {
   return fetchJSON(`https://api.github.com/users/${username}`);
 }

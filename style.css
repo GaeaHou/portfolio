@@ -202,6 +202,18 @@ nav a:hover::after {
   max-width: 300px; /* 控制最大宽度，避免太胖 */
 }
 
+.project-info {
+  margin-top: 0.5em;
+}
+
+.project-year {
+  color: gray;
+  font-family: Baskerville, serif;
+  font-variant-numeric: oldstyle-nums;
+  margin-top: 0.25em;
+  font-size: 0.9em;
+}
+
 /* ===== CV 页面布局 ===== */
 .cv-page .cv-layout {
   display: grid;
