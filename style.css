@@ -224,12 +224,13 @@ nav a:hover::after {
 
 .legend {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(9em, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(6.5em, 1fr));
   gap: 0.8em;
   border: 1px solid #ccc;
   padding: 1em;
   margin-top: 1em;
   list-style: none;
+  font-size: 0.85em; 
 }
 
 .legend-item {
@@ -239,8 +240,8 @@ nav a:hover::after {
 }
 
 .legend-item .swatch {
-  width: 1em;
-  height: 1em;
+  width: 0.9em;
+  height: 0.9em;
   aspect-ratio: 1 / 1;
   background-color: var(--color);
   border-radius: 3px;
