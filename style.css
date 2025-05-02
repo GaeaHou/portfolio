@@ -225,7 +225,7 @@ nav a:hover::after {
 .legend {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(9em, 1fr));
-  gap: 1em;
+  gap: 0.8em;
   border: 1px solid #ccc;
   padding: 1em;
   margin-top: 1em;
