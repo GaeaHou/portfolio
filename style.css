@@ -235,7 +235,7 @@ nav a:hover::after {
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.3em;
 }
 
 .legend-item .swatch {
