@@ -19,9 +19,9 @@ let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
 let sliceGenerator = d3.pie();
 let arcData = sliceGenerator(data);
 
-arcs.forEach((arc, idx) => {
+arcs.forEach((d, idx) => {
   d3.select('#projects-plot')
     .append('path')
-    .attr('d', arc)
+    .attr('d', arcGenerator(d))
     .attr('fill', colors[idx]);
 });
