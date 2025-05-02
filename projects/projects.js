@@ -23,5 +23,5 @@ arcData.forEach((d, idx) => {
   d3.select('#projects-plot')
     .append('path')
     .attr('d', arcGenerator(d))
-    .attr('fill', colors[idx]);
+    .attr('fill', colors(idx));
 });
