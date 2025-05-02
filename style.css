@@ -218,7 +218,7 @@ nav a:hover::after {
 
 .container {
   display: flex;
-  align-items: flex-start;   /* 或 center */
+  align-items: center;   /* 或 center */
   gap: 2em;                  /* 控制图和图例间距 */
   flex-wrap: wrap;           /* 小屏幕自动换行，响应式 */
   margin-top: 2em;
