@@ -11,23 +11,14 @@ renderProjects(projects, projectsContainer, 'h2');
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 
 // 准备数据
-let data = [1, 2];
-let total = 0;
-for (let d of data) total += d;
-
+let data = [1, 2, 3, 4, 5, 5];
+let colors = d3.scaleOrdinal(d3.schemeTableau10);
 // 创建 arc 生成器
 let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
 
 let sliceGenerator = d3.pie();
 let arcData = sliceGenerator(data);
 
-// 根据角度生成路径
-let arcs = arcData.map((d) => arcGenerator(d));
-
-// 添加颜色
-let colors = ['gold', 'purple'];
-
-// 把每个扇形添加到 svg
 arcs.forEach((arc, idx) => {
   d3.select('#projects-plot')
     .append('path')
