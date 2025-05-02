@@ -18,14 +18,8 @@ for (let d of data) total += d;
 // 创建 arc 生成器
 let arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
 
-// 计算每个扇形的起止角度
-let angle = 0;
-let arcData = [];
-for (let d of data) {
-  let endAngle = angle + (d / total) * 2 * Math.PI;
-  arcData.push({ startAngle: angle, endAngle });
-  angle = endAngle;
-}
+let sliceGenerator = d3.pie();
+let arcData = sliceGenerator(data);
 
 // 根据角度生成路径
 let arcs = arcData.map((d) => arcGenerator(d));
