@@ -16,7 +16,6 @@ let selectedIndex = -1;
 let query = '';
 let currentChartData = [];
 
-// ✅ 封装过滤函数：同时考虑搜索关键词和选中的年份
 function getFilteredProjects() {
   let result = projects.filter((project) => {
     const values = Object.values(project).join('\n').toLowerCase();
@@ -31,14 +30,12 @@ function getFilteredProjects() {
   return result;
 }
 
-// ✅ 统一刷新图表 + 项目列表的函数
 function update() {
   const filtered = getFilteredProjects();
   renderProjects(filtered, projectsContainer, 'h2');
   renderPieChart(filtered);
 }
 
-// ✅ 饼图绘制 + 点击事件绑定
 function renderPieChart(projectsInput) {
   const rolledData = d3.rollups(
     projectsInput,
@@ -87,12 +84,10 @@ function renderPieChart(projectsInput) {
   });
 }
 
-// ✅ 输入框监听：修改 query 并刷新
 searchInput.addEventListener('input', (event) => {
   query = event.target.value;
   update();
 });
 
-// 首次渲染
 renderProjects(projects, projectsContainer, 'h2');
 renderPieChart(projects);
