@@ -36,7 +36,7 @@ function renderPieChart(projectsGiven) {
     value: count
   }));
 
-  const colors = d3.scaleOrdinal(d3.schemeTableau10);
+  const colors = d3.scaleOrdinal(d3.schemeSet2);
   const arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
   const sliceGenerator = d3.pie().value(d => d.value);
   const arcData = sliceGenerator(data);
