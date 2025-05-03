@@ -230,6 +230,20 @@ nav a:hover::after {
   height: auto;
 }
 
+#projects-plot:has(path:hover) path:not(:hover) {
+  opacity: 0.5;
+}
+
+path {
+  transition: 300ms;
+  cursor: pointer;
+}
+
+.selected {
+  --color: oklch(60% 45% 0) !important;
+  fill: var(--color);
+}
+
 .legend {
   flex: 1;                   /* 占据剩余空间 */
   display: grid;
@@ -247,12 +261,17 @@ nav a:hover::after {
   gap: 0.4em;
 }
 
-.legend-item .swatch {
-  width: 0.8em;
-  height: 0.8em;
-  border-radius: 3px;
-  background-color: var(--color);
+.legend-item.selected {
+  --color: oklch(60% 45% 0) !important;
+}
+
+.swatch {
+  width: 1em;
+  height: 1em;
+  background: var(--color);
   display: inline-block;
+  border-radius: 0.2em;
+  margin-right: 0.5em;
 }
 
 .searchBar {

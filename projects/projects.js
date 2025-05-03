@@ -1,34 +1,34 @@
 import { fetchJSON, renderProjects } from '../global.js';
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 
-// 加载项目数据
 const projects = await fetchJSON('../lib/projects.json');
-
-// 设置页面标题
 const titleElement = document.querySelector('.projects-title');
 if (titleElement) {
   titleElement.textContent = `${projects.length} Projects`;
 }
-
-// 渲染项目卡片容器
 const projectsContainer = document.querySelector('.projects');
+renderProjects(projects, projectsContainer, 'h2');
+
+let selectedIndex = -1;
+let query = '';
 const searchInput = document.querySelector('.searchBar');
 
-// 搜索关键词
-let query = '';
+searchInput.addEventListener('input', (event) => {
+  query = event.target.value;
+  const filteredProjects = projects.filter((project) => {
+    const values = Object.values(project).join('\n').toLowerCase();
+    return values.includes(query.toLowerCase());
+  });
 
-// 封装绘制饼图和图例的函数
-function renderPieChart(projectsGiven) {
-  const svg = d3.select('#projects-plot');
-  svg.selectAll('path').remove();
+  renderProjects(filteredProjects, projectsContainer, 'h2');
+  renderPieChart(filteredProjects);
+});
 
-  const legend = d3.select('.legend');
-  legend.selectAll('li').remove();
-
+function renderPieChart(projectsInput) {
   const rolledData = d3.rollups(
-    projectsGiven,
-    v => v.length,
-    d => d.year
+    projectsInput,
+    (v) => v.length,
+    (d) => d.year
   );
 
   const data = rolledData.map(([year, count]) => ({
@@ -36,38 +36,76 @@ function renderPieChart(projectsGiven) {
     value: count
   }));
 
-  const colors = d3.scaleOrdinal(d3.schemeSet2);
+  const colors = d3.scaleOrdinal(d3.schemeTableau10);
   const arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
-  const sliceGenerator = d3.pie().value(d => d.value);
+  const sliceGenerator = d3.pie().value((d) => d.value);
   const arcData = sliceGenerator(data);
 
-  arcData.forEach((d, idx) => {
-    svg.append('path')
+  const svg = d3.select('#projects-plot');
+  svg.selectAll('path').remove();
+
+  arcData.forEach((d, i) => {
+    svg
+      .append('path')
       .attr('d', arcGenerator(d))
-      .attr('fill', colors(idx));
+      .attr('fill', colors(i))
+      .attr('style', `--color:${colors(i)}`)
+      .attr('class', i === selectedIndex ? 'selected' : '')
+      .on('click', () => {
+        selectedIndex = selectedIndex === i ? -1 : i;
+
+        svg.selectAll('path').attr('class', (_, idx) =>
+          idx === selectedIndex ? 'selected' : ''
+        );
+
+        d3.select('.legend')
+          .selectAll('li')
+          .attr('class', (d, idx) =>
+            idx === selectedIndex ? 'legend-item selected' : 'legend-item'
+          );
+
+        if (selectedIndex === -1) {
+          renderProjects(projectsInput, projectsContainer, 'h2');
+        } else {
+          const selectedYear = data[selectedIndex].label;
+          const filtered = projectsInput.filter(
+            (p) => String(p.year) === String(selectedYear)
+          );
+          renderProjects(filtered, projectsContainer, 'h2');
+        }
+      });
   });
 
-  data.forEach((d, idx) => {
-    legend.append('li')
-      .attr('class', 'legend-item')
-      .attr('style', `--color:${colors(idx)}`)
-      .html(`<span class="swatch"></span> ${d.label} <em>(${d.value})</em>`);
+  const legend = d3.select('.legend');
+  legend.selectAll('li').remove();
+
+  data.forEach((d, i) => {
+    legend
+      .append('li')
+      .attr('style', `--color:${colors(i)}`)
+      .attr('class', i === selectedIndex ? 'legend-item selected' : 'legend-item')
+      .html(`<span class="swatch"></span> ${d.label} <em>(${d.value})</em>`)
+      .on('click', () => {
+        selectedIndex = selectedIndex === i ? -1 : i;
+
+        svg.selectAll('path').attr('class', (_, idx) =>
+          idx === selectedIndex ? 'selected' : ''
+        );
+        legend.selectAll('li').attr('class', (_, idx) =>
+          idx === selectedIndex ? 'legend-item selected' : 'legend-item'
+        );
+
+        if (selectedIndex === -1) {
+          renderProjects(projectsInput, projectsContainer, 'h2');
+        } else {
+          const selectedYear = data[selectedIndex].label;
+          const filtered = projectsInput.filter(
+            (p) => String(p.year) === String(selectedYear)
+          );
+          renderProjects(filtered, projectsContainer, 'h2');
+        }
+      });
   });
 }
 
-// 页面初始渲染
-renderProjects(projects, projectsContainer, 'h2');
 renderPieChart(projects);
-
-// 搜索栏监听
-searchInput.addEventListener('input', (event) => {
-  query = event.target.value.toLowerCase();
-
-  const filteredProjects = projects.filter((project) => {
-    const values = Object.values(project).join('\n').toLowerCase();
-    return values.includes(query);
-  });
-
-  renderProjects(filteredProjects, projectsContainer, 'h2');
-  renderPieChart(filteredProjects);
-});
