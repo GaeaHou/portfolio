@@ -6,24 +6,39 @@ const titleElement = document.querySelector('.projects-title');
 if (titleElement) {
   titleElement.textContent = `${projects.length} Projects`;
 }
+
 const projectsContainer = document.querySelector('.projects');
-renderProjects(projects, projectsContainer, 'h2');
+const searchInput = document.querySelector('.searchBar');
+const svg = d3.select('#projects-plot');
+const legend = d3.select('.legend');
 
 let selectedIndex = -1;
 let query = '';
-const searchInput = document.querySelector('.searchBar');
+let currentChartData = [];
 
-searchInput.addEventListener('input', (event) => {
-  query = event.target.value;
-  const filteredProjects = projects.filter((project) => {
+// ✅ 封装过滤函数：同时考虑搜索关键词和选中的年份
+function getFilteredProjects() {
+  let result = projects.filter((project) => {
     const values = Object.values(project).join('\n').toLowerCase();
     return values.includes(query.toLowerCase());
   });
 
-  renderProjects(filteredProjects, projectsContainer, 'h2');
-  renderPieChart(filteredProjects);
-});
+  if (selectedIndex !== -1) {
+    const selectedYear = currentChartData[selectedIndex].label;
+    result = result.filter((p) => String(p.year) === String(selectedYear));
+  }
 
+  return result;
+}
+
+// ✅ 统一刷新图表 + 项目列表的函数
+function update() {
+  const filtered = getFilteredProjects();
+  renderProjects(filtered, projectsContainer, 'h2');
+  renderPieChart(filtered);
+}
+
+// ✅ 饼图绘制 + 点击事件绑定
 function renderPieChart(projectsInput) {
   const rolledData = d3.rollups(
     projectsInput,
@@ -36,13 +51,15 @@ function renderPieChart(projectsInput) {
     value: count
   }));
 
+  currentChartData = data;
+
   const colors = d3.scaleOrdinal(d3.schemeTableau10);
   const arcGenerator = d3.arc().innerRadius(0).outerRadius(50);
   const sliceGenerator = d3.pie().value((d) => d.value);
   const arcData = sliceGenerator(data);
 
-  const svg = d3.select('#projects-plot');
   svg.selectAll('path').remove();
+  legend.selectAll('li').remove();
 
   arcData.forEach((d, i) => {
     svg
@@ -53,31 +70,9 @@ function renderPieChart(projectsInput) {
       .attr('class', i === selectedIndex ? 'selected' : '')
       .on('click', () => {
         selectedIndex = selectedIndex === i ? -1 : i;
-
-        svg.selectAll('path').attr('class', (_, idx) =>
-          idx === selectedIndex ? 'selected' : ''
-        );
-
-        d3.select('.legend')
-          .selectAll('li')
-          .attr('class', (d, idx) =>
-            idx === selectedIndex ? 'legend-item selected' : 'legend-item'
-          );
-
-        if (selectedIndex === -1) {
-          renderProjects(projectsInput, projectsContainer, 'h2');
-        } else {
-          const selectedYear = data[selectedIndex].label;
-          const filtered = projectsInput.filter(
-            (p) => String(p.year) === String(selectedYear)
-          );
-          renderProjects(filtered, projectsContainer, 'h2');
-        }
+        update();
       });
   });
-
-  const legend = d3.select('.legend');
-  legend.selectAll('li').remove();
 
   data.forEach((d, i) => {
     legend
@@ -87,25 +82,17 @@ function renderPieChart(projectsInput) {
       .html(`<span class="swatch"></span> ${d.label} <em>(${d.value})</em>`)
       .on('click', () => {
         selectedIndex = selectedIndex === i ? -1 : i;
-
-        svg.selectAll('path').attr('class', (_, idx) =>
-          idx === selectedIndex ? 'selected' : ''
-        );
-        legend.selectAll('li').attr('class', (_, idx) =>
-          idx === selectedIndex ? 'legend-item selected' : 'legend-item'
-        );
-
-        if (selectedIndex === -1) {
-          renderProjects(projectsInput, projectsContainer, 'h2');
-        } else {
-          const selectedYear = data[selectedIndex].label;
-          const filtered = projectsInput.filter(
-            (p) => String(p.year) === String(selectedYear)
-          );
-          renderProjects(filtered, projectsContainer, 'h2');
-        }
+        update();
       });
   });
 }
 
+// ✅ 输入框监听：修改 query 并刷新
+searchInput.addEventListener('input', (event) => {
+  query = event.target.value;
+  update();
+});
+
+// 首次渲染
+renderProjects(projects, projectsContainer, 'h2');
 renderPieChart(projects);
