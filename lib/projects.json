@@ -1,5 +1,13 @@
 [
     {
+        "title": "Anesthesia Type Distribution and Average Duration Across Cases",
+        "year": "2025",
+        "image": "/portfolio/projects/image.png",
+        "description": "This chart shows the distribution of anesthesia types and their average durations. Click on a bar to view detailed information.",
+        "link": "/portfolio/projects/plot1.html"
+    },
+
+    {
         "title": "Global Gender Gap in Primary Education",
         "year": "2025",
         "image": "/portfolio/projects/1.png",

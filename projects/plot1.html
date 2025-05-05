@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Anesthesia Type Distribution</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .bar { fill: steelblue; cursor: pointer; }
+    .bar:hover { fill: orange; }
+    .highlighted { stroke: red; stroke-width: 2px; }
+    .label { font-size: 12px; text-anchor: middle; }
+    .dot { fill: red; }
+    .dot.highlighted { stroke: black; stroke-width: 2px; r: 6px; }
+  </style>
+</head>
+<body>
+  <h2>Anesthesia Type Distribution</h2>
+  <svg width="700" height="450"></svg>
+  <p id="info">Click on a bar to see average duration.</p>
+
+  <script>
+    const svg = d3.select("svg");
+    const fullWidth = +svg.attr("width");
+    const fullHeight = +svg.attr("height");
+    const margin = { top: 20, right: 80, bottom: 50, left: 60 };
+    const width = fullWidth - margin.left - margin.right;
+    const height = fullHeight - margin.top - margin.bottom;
+
+    const chart = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    d3.csv("summary_stats_combined_filtered.csv").then(data => {
+      // Group by anesthesia type
+      const grouped = d3.rollup(
+        data,
+        v => ({
+          count: v.length,
+          avgDuration: d3.mean(v, d => +d.ane_duration)
+        }),
+        d => d.ane_type
+      );
+
+      const entries = Array.from(grouped, ([ane_type, stats]) => ({
+        ane_type,
+        ...stats
+      }));
+
+      // Scales
+      const x = d3.scaleBand()
+        .domain(entries.map(d => d.ane_type))
+        .range([0, width])
+        .padding(0.2);
+
+      const yLeft = d3.scaleLinear()
+        .domain([0, d3.max(entries, d => d.count)]).nice()
+        .range([height, 0]);
+
+      const yRight = d3.scaleLinear()
+        .domain([0, d3.max(entries, d => d.avgDuration)]).nice()
+        .range([height, 0]);
+
+      // Axes
+      chart.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x));
+
+      chart.append("g")
+        .call(d3.axisLeft(yLeft));
+
+      chart.append("g")
+        .attr("transform", `translate(${width},0)`)
+        .call(d3.axisRight(yRight));
+
+      // Bars
+      chart.selectAll(".bar")
+        .data(entries)
+        .enter()
+        .append("rect")
+        .attr("class", "bar")
+        .attr("x", d => x(d.ane_type))
+        .attr("y", d => yLeft(d.count))
+        .attr("width", x.bandwidth())
+        .attr("height", d => height - yLeft(d.count))
+        .on("click", function(event, d) {
+          chart.selectAll(".bar").classed("highlighted", false);
+          chart.selectAll(".dot").attr("r", 4).classed("highlighted", false);
+          d3.select(this).classed("highlighted", true);
+          chart.selectAll(".dot")
+            .filter(p => p.ane_type === d.ane_type)
+            .classed("highlighted", true)
+            .attr("r", 7);
+          d3.select("#info").text(`🩺 ${d.ane_type}: ${d.count} cases, Avg duration: ${d.avgDuration.toFixed(1)} mins`);
+        });
+
+      // Labels on top of bars
+      chart.selectAll(".label")
+        .data(entries)
+        .enter()
+        .append("text")
+        .attr("class", "label")
+        .attr("x", d => x(d.ane_type) + x.bandwidth()/2)
+        .attr("y", d => yLeft(d.count) - 5)
+        .attr("text-anchor", "middle")
+        .text(d => d.count);
+
+      // Line path for average duration
+      const line = d3.line()
+        .x(d => x(d.ane_type) + x.bandwidth()/2)
+        .y(d => yRight(d.avgDuration));
+
+      chart.append("path")
+        .datum(entries)
+        .attr("fill", "none")
+        .attr("stroke", "red")
+        .attr("stroke-width", 2)
+        .attr("d", line);
+
+      // Red dots
+      chart.selectAll(".dot")
+        .data(entries)
+        .enter()
+        .append("circle")
+        .attr("class", "dot")
+        .attr("cx", d => x(d.ane_type) + x.bandwidth()/2)
+        .attr("cy", d => yRight(d.avgDuration))
+        .attr("r", 4);
+    });
+  </script>
+</body>
+</html>
