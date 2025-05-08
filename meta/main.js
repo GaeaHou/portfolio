@@ -101,7 +101,7 @@ function renderCommitInfo(data, commits) {
     const svg = d3
       .select('#chart')
       .append('svg')
-      .attr('viewBox', `0 0 ${width} ${height + 60}`) // 给图例预留空间
+      .attr('viewBox', `0 0 ${width} ${height + 60}`)
       .style('overflow', 'visible');
   
     const xScale = d3.scaleTime()
@@ -122,12 +122,10 @@ function renderCommitInfo(data, commits) {
       .domain([minLines, maxLines])
       .range([3, 20]);
   
-    // ✅ 添加网格线
     svg.append('g')
       .attr('transform', `translate(${usableArea.left}, 0)`)
       .call(d3.axisLeft(yScale).tickFormat('').tickSize(-usableArea.width));
   
-    // ✅ 添加坐标轴
     svg.append('g')
       .attr('transform', `translate(${usableArea.left}, 0)`)
       .call(d3.axisLeft(yScale).tickFormat(d => String(d % 24).padStart(2, '0') + ':00'));
@@ -136,7 +134,6 @@ function renderCommitInfo(data, commits) {
       .attr('transform', `translate(0, ${usableArea.bottom})`)
       .call(d3.axisBottom(xScale));
   
-    // ✅ 绘制点（按修改行数降序）
     const sortedCommits = d3.sort(commits, d => -d.totalLines);
   
     svg.append('g')
@@ -166,72 +163,111 @@ function renderCommitInfo(data, commits) {
     // ✅ 添加图例（颜色条）
     const legendWidth = 300;
     const legendHeight = 12;
-  
+
     const legendGroup = svg.append("g")
-      .attr("class", "legend")
-      .attr("transform", `translate(${(width - legendWidth) / 2}, ${height + 40})`);
-  
+    .attr("class", "legend")
+    .attr("transform", `translate(${(width - legendWidth) / 2}, ${height + 40})`);
+
     const legendScale = d3.scaleLinear().domain([0, 24]).range([0, legendWidth]);
-  
+
     const gradientId = "legend-gradient";
-  
+
     // 定义渐变色
     const defs = svg.append("defs");
     const linearGradient = defs.append("linearGradient")
-      .attr("id", gradientId)
-      .attr("x1", "0%").attr("x2", "100%")
-      .attr("y1", "0%").attr("y2", "0%");
-  
+    .attr("id", gradientId)
+    .attr("x1", "0%").attr("x2", "100%")
+    .attr("y1", "0%").attr("y2", "0%");
+
     for (let i = 0; i <= 24; i++) {
-      linearGradient.append("stop")
+    linearGradient.append("stop")
         .attr("offset", `${(i / 24) * 100}%`)
         .attr("stop-color", colorScale(i));
     }
-  
+
     // 绘制渐变矩形
     legendGroup.append("rect")
-      .attr("width", legendWidth)
-      .attr("height", legendHeight)
-      .style("fill", `url(#${gradientId})`)
-      .attr("stroke", "#ccc")
-      .attr("stroke-width", 0.5);
-  
+    .attr("width", legendWidth)
+    .attr("height", legendHeight)
+    .style("fill", `url(#${gradientId})`)
+    .attr("stroke", "#ccc")
+    .attr("stroke-width", 0.5);
+
     // 添加刻度
     const legendAxis = d3.axisBottom(legendScale)
-      .tickValues([0, 6, 12, 18, 24])
-      .tickFormat(d => {
+    .tickValues([0, 6, 12, 18, 24])
+    .tickFormat(d => {
         if (d === 0) return "Midnight";
         if (d === 6) return "6am";
         if (d === 12) return "Noon";
         if (d === 18) return "6pm";
         if (d === 24) return "Midnight";
         return d;
-      });
-  
+    });
+
     legendGroup.append("g")
-      .attr("transform", `translate(0, ${legendHeight})`)
-      .call(legendAxis)
-      .selectAll("text")
-      .style("font-size", "0.75em");
-
-      // ✅ 添加 brushing 功能
+    .attr("transform", `translate(0, ${legendHeight})`)
+    .call(legendAxis)
+    .selectAll("text")
+    .style("font-size", "0.75em");
+  
+    // ✅ 添加 brushing
     const brush = d3.brush()
-        .extent([[usableArea.left, usableArea.top], [usableArea.right, usableArea.bottom]])
-        .on("start brush end", brushed); // 绑定事件处理函数
-
+      .extent([[usableArea.left, usableArea.top], [usableArea.right, usableArea.bottom]])
+      .on("start brush end", brushed);
     svg.call(brush);
-
-    // ✅ 让圆点浮在 brush 前面
+  
     svg.selectAll('.dots, .overlay ~ *').raise();
-
-    // ✅ 处理被选中的圆点
+  
+    // ✅ 实现 brushing 逻辑和辅助函数（定义在 renderScatterPlot 内部）
+    function isCommitSelected(selection, commit) {
+      if (!selection) return false;
+      const [[x0, y0], [x1, y1]] = selection;
+      const x = xScale(commit.datetime);
+      const y = yScale(commit.hourFrac);
+      return x0 <= x && x <= x1 && y0 <= y && y <= y1;
+    }
+  
+    function renderSelectionCount(selection) {
+      const selectedCommits = selection
+        ? commits.filter((d) => isCommitSelected(selection, d))
+        : [];
+      const countElement = document.getElementById('selection-count');
+      countElement.textContent = `${
+        selectedCommits.length || 'No'
+      } commits selected`;
+      return selectedCommits;
+    }
+  
+    function renderLanguageBreakdown(selection) {
+      const selectedCommits = selection
+        ? commits.filter((d) => isCommitSelected(selection, d))
+        : [];
+      const container = document.getElementById('language-breakdown');
+  
+      if (selectedCommits.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
+  
+      const lines = selectedCommits.flatMap((d) => d.lines);
+      const breakdown = d3.rollup(lines, v => v.length, d => d.type);
+      container.innerHTML = '';
+      for (const [lang, count] of breakdown) {
+        const proportion = count / lines.length;
+        container.innerHTML += `
+          <dt>${lang}</dt>
+          <dd>${count} lines (${d3.format('.1~%')(proportion)})</dd>`;
+      }
+    }
+  
     function brushed(event) {
-    const selection = event.selection;
-    d3.selectAll("circle").classed("selected", d =>
+      const selection = event.selection;
+      d3.selectAll("circle").classed("selected", d =>
         isCommitSelected(selection, d)
-    );
-    renderSelectionCount(selection);
-    renderLanguageBreakdown(selection);
+      );
+      renderSelectionCount(selection);
+      renderLanguageBreakdown(selection);
     }
   }
 
