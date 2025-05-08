@@ -244,6 +244,7 @@ function renderCommitInfo(data, commits) {
           ? commits.filter((d) => isCommitSelected(selection, d))
           : [];
         const container = document.getElementById('language-breakdown');
+        container.className = 'language-columns';  // 设置 class
         container.innerHTML = '';
       
         if (selectedCommits.length === 0) return;
