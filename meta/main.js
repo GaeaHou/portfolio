@@ -213,6 +213,26 @@ function renderCommitInfo(data, commits) {
       .call(legendAxis)
       .selectAll("text")
       .style("font-size", "0.75em");
+
+      // ✅ 添加 brushing 功能
+    const brush = d3.brush()
+        .extent([[usableArea.left, usableArea.top], [usableArea.right, usableArea.bottom]])
+        .on("start brush end", brushed); // 绑定事件处理函数
+
+    svg.call(brush);
+
+    // ✅ 让圆点浮在 brush 前面
+    svg.selectAll('.dots, .overlay ~ *').raise();
+
+    // ✅ 处理被选中的圆点
+    function brushed(event) {
+    const selection = event.selection;
+    d3.selectAll("circle").classed("selected", d =>
+        isCommitSelected(selection, d)
+    );
+    renderSelectionCount(selection);
+    renderLanguageBreakdown(selection);
+    }
   }
 
 function renderTooltipContent(commit) {
@@ -232,6 +252,48 @@ function updateTooltipPosition(event) {
     const tooltip = document.getElementById('commit-tooltip');
     tooltip.style.left = `${event.clientX + 10}px`;  // 偏移一点
     tooltip.style.top = `${event.clientY + 10}px`;
+  }
+
+function isCommitSelected(selection, commit) {
+    if (!selection) return false;
+    const [[x0, y0], [x1, y1]] = selection;
+    const x = xScale(commit.datetime);
+    const y = yScale(commit.hourFrac);
+    return x0 <= x && x <= x1 && y0 <= y && y <= y1;
+  }
+  
+function renderSelectionCount(selection) {
+    const selectedCommits = selection
+      ? commits.filter((d) => isCommitSelected(selection, d))
+      : [];
+    const countElement = document.getElementById('selection-count');
+    countElement.textContent = `${
+      selectedCommits.length || 'No'
+    } commits selected`;
+    return selectedCommits;
+  }
+  
+function renderLanguageBreakdown(selection) {
+    const selectedCommits = selection
+      ? commits.filter((d) => isCommitSelected(selection, d))
+      : [];
+    const container = document.getElementById('language-breakdown');
+  
+    if (selectedCommits.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+  
+    const lines = selectedCommits.flatMap((d) => d.lines);
+  
+    const breakdown = d3.rollup(lines, v => v.length, d => d.type);
+    container.innerHTML = '';
+    for (const [lang, count] of breakdown) {
+      const proportion = count / lines.length;
+      container.innerHTML += `
+        <dt>${lang}</dt>
+        <dd>${count} lines (${d3.format('.1~%')(proportion)})</dd>`;
+    }
   }
 
   async function main() {
