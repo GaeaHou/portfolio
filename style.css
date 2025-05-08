@@ -510,37 +510,43 @@ circle.selected {
 }
 
 #selection-count {
-  font-size: 1.1em;
-  font-weight: bold;
-  margin: 2em 0 1em 0;
+  font-size: 1.2em;
+  font-weight: 600;
   text-align: center;
+  margin: 2em 0 1em;
 }
 
-.language-breakdown-grid {
+.language-columns {
   display: flex;
   justify-content: center;
-  gap: 3em;
-  text-align: center;
-  font-family: sans-serif;
+  gap: 5em;
+  text-align: left;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 3em;
 }
 
 .lang-block {
   display: flex;
   flex-direction: column;
-  gap: 0.3em;
+  align-items: flex-start;
+  gap: 0.2em;
+  min-width: 6em;
 }
 
 .lang-name {
-  font-weight: 700;
-  font-size: 1.2em;
+  font-weight: bold;
+  font-size: 1.1em;
+  text-transform: uppercase;
 }
 
 .lang-lines {
-  font-size: 1em;
+  font-size: 0.95em;
 }
 
 .lang-percent {
-  font-size: 0.95em;
+  font-size: 0.9em;
   color: #555;
 }
 
