@@ -516,7 +516,7 @@ circle.selected {
   margin: 2em 0 1em;
 }
 
-.language-columns {
+#language-breakdown.language-columns {
   display: flex;
   justify-content: center;
   gap: 5em;
@@ -525,6 +525,9 @@ circle.selected {
   font-size: 1rem;
   font-weight: 400;
   margin-bottom: 3em;
+
+  min-height: 5em; /* ✅ 给个固定初始高度，避免首次渲染时跳动 */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* 平滑动画 */
 }
 
 .lang-block {
