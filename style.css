@@ -414,13 +414,14 @@ time {
 .stat-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 3em;
+  gap: 3em 2em;
   justify-content: flex-start;
   align-items: flex-start;
+  flex-direction: row; /* 强制横向排列 */
 }
 
 .stat-card {
-  flex: 0 1 auto;
+  flex: 0 0 auto;  /* 不拉伸 */
   text-align: left;
   min-width: 100px;
 }
