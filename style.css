@@ -497,6 +497,24 @@ circle:hover {
   transform: scale(1.5);
 }
 
+circle.selected {
+  fill: #ff6b6b;
+}
+
+.selection {
+  fill-opacity: 0.1;
+  stroke: black;
+  stroke-opacity: 0.7;
+  stroke-dasharray: 5 3;
+  animation: marching-ants 2s linear infinite;
+}
+
+@keyframes marching-ants {
+  to {
+    stroke-dashoffset: -8;
+  }
+}
+
 /* ===== Summary Stats 暗色模式 ===== */
 html[color-scheme="dark"] .stat-label {
   color: #c4c4c4;
