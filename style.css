@@ -440,6 +440,16 @@ time {
   color: #111;
 }
 
+.gridlines line {
+  stroke: #ccc;
+  stroke-opacity: 0.3;
+  shape-rendering: crispEdges;
+}
+
+.gridlines path {
+  display: none;
+}
+
 /* ===== Summary Stats 暗色模式 ===== */
 html[color-scheme="dark"] .stat-label {
   color: #c4c4c4;
