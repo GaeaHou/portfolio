@@ -44,6 +44,8 @@ function processCommits(data) {
 }
 
 function renderCommitInfo(data, commits) {
+    d3.select("#stats").html(""); 
+    
     const totalLOC = data.length;
     const totalCommits = commits.length;
     const totalFiles = d3.groups(data, d => d.file).length;
@@ -80,13 +82,7 @@ function renderCommitInfo(data, commits) {
     cards.append("div").attr("class", "stat-value").text(d => d.value);
   }
   
-async function main() {
-    const data = await loadData();
-    const commits = processCommits(data);
-    renderCommitInfo(data, commits);
-}
-  
-main();
+
 
 function renderScatterPlot(data, commits) {
     const width = 1000;
@@ -159,8 +155,11 @@ function renderScatterPlot(data, commits) {
       .attr('opacity', 0.8);
   }
 
-  let data = await loadData();
-  let commits = processCommits(data);
+  async function main() {
+    const data = await loadData();
+    const commits = processCommits(data);
+    renderCommitInfo(data, commits);
+    renderScatterPlot(data, commits);
+  }
   
-  renderCommitInfo(data, commits);
-  renderScatterPlot(data, commits);
+main();
