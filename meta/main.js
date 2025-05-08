@@ -43,7 +43,48 @@ function processCommits(data) {
       });
 }
 
-function renderScatterPlot(data, commits) {
+function renderCommitInfo(data, commits) {
+    d3.select("#stats").html(""); 
+    
+    const totalLOC = data.length;
+    const totalCommits = commits.length;
+    const totalFiles = d3.groups(data, d => d.file).length;
+    const maxDepth = d3.max(data, d => d.depth);
+    const longestLine = d3.max(data, d => d.length);
+    const maxLines = d3.max(
+      d3.rollups(data, v => d3.max(v, d => d.line), d => d.file),
+      d => d[1]
+    );
+  
+    const stats = [
+      { label: "Commits", value: totalCommits },
+      { label: "Files", value: totalFiles },
+      { label: "Total LOC", value: totalLOC },
+      { label: "Max Depth", value: maxDepth },
+      { label: "Longest Line", value: longestLine },
+      { label: "Max Lines", value: maxLines },
+    ];
+  
+    const container = d3.select("#stats")
+      .append("section")
+      .attr("class", "summary-panel");
+  
+  
+    const statRow = container.append("div").attr("class", "stat-grid");
+  
+    const cards = statRow.selectAll("div")
+      .data(stats)
+      .enter()
+      .append("div")
+      .attr("class", "stat-card");
+  
+    cards.append("div").attr("class", "stat-label").text(d => d.label.toUpperCase());
+    cards.append("div").attr("class", "stat-value").text(d => d.value);
+  }
+  
+
+
+  function renderScatterPlot(data, commits) {
     const width = 1000;
     const height = 600;
     const margin = { top: 10, right: 10, bottom: 40, left: 50 };
