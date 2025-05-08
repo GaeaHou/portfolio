@@ -399,6 +399,25 @@ time {
   font-weight: bold;
   margin-top: 0.2em;
 }
+
+.stats {
+  margin-top: 1em;
+  padding: 1em;
+  border: 1px solid #ccc;
+  background: #f8f8f8;
+  border-radius: 6px;
+  max-width: 600px;
+}
+
+.stats dt {
+  font-weight: bold;
+  margin-top: 0.5em;
+}
+
+.stats dd {
+  margin-left: 1em;
+  margin-bottom: 0.5em;
+}
 /* ===== 🌙 暗色模式样式 ===== */
 html[color-scheme="dark"] nav {
   background-color: #2a2f33 !important; /* 强制覆盖导航栏背景 */
