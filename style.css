@@ -450,6 +450,53 @@ time {
   display: none;
 }
 
+dl.info {
+  position: fixed;
+  top: 1em;
+  left: 1em;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #000;
+  padding: 1em;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+  display: grid;
+  grid-template-columns: max-content auto;
+  gap: 0.3em 0.8em;
+  font-size: 0.9em;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  z-index: 999;
+}
+
+dl.info[hidden]:not(:hover, :focus-within) {
+  opacity: 0;
+  visibility: hidden;
+}
+
+dl.info dt {
+  font-weight: bold;
+  color: #666;
+  margin: 0;
+}
+
+dl.info dd {
+  margin: 0;
+}
+
+.tooltip {
+  pointer-events: none;
+}
+
+circle {
+  transition: 200ms;
+  transform-origin: center;
+  transform-box: fill-box;
+}
+
+circle:hover {
+  transform: scale(1.5);
+}
+
 /* ===== Summary Stats 暗色模式 ===== */
 html[color-scheme="dark"] .stat-label {
   color: #c4c4c4;

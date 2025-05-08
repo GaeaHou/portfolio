@@ -98,39 +98,32 @@ function renderScatterPlot(data, commits) {
       height: height - margin.top - margin.bottom,
     };
   
-    // Create SVG
     const svg = d3
       .select('#chart')
       .append('svg')
       .attr('viewBox', `0 0 ${width} ${height}`)
       .style('overflow', 'visible');
   
-    // X: time (date)
     const xScale = d3.scaleTime()
       .domain(d3.extent(commits, d => d.datetime))
       .range([usableArea.left, usableArea.right])
       .nice();
   
-    // Y: hour (0-24)
     const yScale = d3.scaleLinear()
       .domain([0, 24])
       .range([usableArea.bottom, usableArea.top]);
   
-    // Color: based on hour
     const colorScale = d3.scaleSequential()
       .domain([0, 24])
-      .interpolator(d3.interpolateWarm); // or interpolateCool, interpolatePlasma
+      .interpolator(d3.interpolateWarm);
   
-    // Gridlines
-    const gridlines = svg.append('g')
+    // Add gridlines
+    svg.append('g')
       .attr('class', 'gridlines')
-      .attr('transform', `translate(${usableArea.left}, 0)`);
+      .attr('transform', `translate(${usableArea.left}, 0)`)
+      .call(d3.axisLeft(yScale).tickFormat('').tickSize(-usableArea.width));
   
-    gridlines.call(
-      d3.axisLeft(yScale).tickFormat('').tickSize(-usableArea.width)
-    );
-  
-    // Axes
+    // Y Axis
     svg.append('g')
       .attr('transform', `translate(${usableArea.left}, 0)`)
       .call(
@@ -138,21 +131,50 @@ function renderScatterPlot(data, commits) {
           .tickFormat(d => String(d % 24).padStart(2, '0') + ':00')
       );
   
+    // X Axis
     svg.append('g')
       .attr('transform', `translate(0, ${usableArea.bottom})`)
       .call(d3.axisBottom(xScale));
   
-    // Dots
-    const dots = svg.append('g').attr('class', 'dots');
-  
-    dots.selectAll('circle')
+    // Draw dots with tooltip
+    svg.append('g')
+      .attr('class', 'dots')
+      .selectAll('circle')
       .data(commits)
       .join('circle')
       .attr('cx', d => xScale(d.datetime))
       .attr('cy', d => yScale(d.hourFrac))
-      .attr('r', 4)
+      .attr('r', 5)
       .attr('fill', d => colorScale(d.hourFrac))
-      .attr('opacity', 0.8);
+      .attr('opacity', 0.8)
+      .on('mouseenter', (event, commit) => {
+        renderTooltipContent(commit);
+        updateTooltipVisibility(true);
+        updateTooltipPosition(event);
+      })
+      .on('mouseleave', () => {
+        updateTooltipVisibility(false);
+      })
+      .on('mousemove', updateTooltipPosition);  // 鼠标移动时更新位置
+  }
+
+function renderTooltipContent(commit) {
+    document.getElementById('commit-link').href = commit.url;
+    document.getElementById('commit-link').textContent = commit.id;
+    document.getElementById('commit-date').textContent = commit.datetime.toLocaleDateString();
+    document.getElementById('commit-time').textContent = commit.datetime.toLocaleTimeString();
+    document.getElementById('commit-author').textContent = commit.author;
+    document.getElementById('commit-lines').textContent = commit.totalLines;
+  }
+
+function updateTooltipVisibility(isVisible) {
+    document.getElementById('commit-tooltip').hidden = !isVisible;
+  }
+
+function updateTooltipPosition(event) {
+    const tooltip = document.getElementById('commit-tooltip');
+    tooltip.style.left = `${event.clientX + 10}px`;  // 偏移一点
+    tooltip.style.top = `${event.clientY + 10}px`;
   }
 
   async function main() {
