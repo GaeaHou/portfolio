@@ -44,48 +44,41 @@ function processCommits(data) {
 }
 
 function renderCommitInfo(data, commits) {
-    const dl = d3.select('#stats').append('dl').attr('class', 'stats');
-  
-    // Total LOC
-    dl.append('dt').html('Total <abbr title="Lines of code">LOC</abbr>');
-    dl.append('dd').text(data.length);
-  
-    // Total commits
-    dl.append('dt').text('Total commits');
-    dl.append('dd').text(commits.length);
-  
-    // Number of files
-    dl.append('dt').text('Number of files');
-    dl.append('dd').text(d3.groups(data, d => d.file).length);
-  
-    // Longest line
-    const longestLine = d3.greatest(data, d => d.length);
-    dl.append('dt').text('Longest line');
-    dl.append('dd').text(longestLine?.length + ' chars');
-  
-    // Deepest line
-    const deepest = d3.greatest(data, d => d.depth);
-    dl.append('dt').text('Max depth');
-    dl.append('dd').text(deepest?.depth);
-  
-    // Average file length (in lines)
-    const fileLengths = d3.rollups(
-      data,
-      v => d3.max(v, d => d.line),
-      d => d.file
+    const totalLOC = data.length;
+    const totalCommits = commits.length;
+    const totalFiles = d3.groups(data, d => d.file).length;
+    const maxDepth = d3.max(data, d => d.depth);
+    const longestLine = d3.max(data, d => d.length);
+    const maxLines = d3.max(
+      d3.rollups(data, v => d3.max(v, d => d.line), d => d.file),
+      d => d[1]
     );
-    dl.append('dt').text('Avg file length (lines)');
-    dl.append('dd').text(d3.mean(fileLengths, d => d[1]).toFixed(2));
   
-    // Most active time of day
-    const periodWork = d3.rollups(
-      data,
-      v => v.length,
-      d => d.datetime.toLocaleString('en', { dayPeriod: 'short' })
-    );
-    const mostWorkPeriod = d3.greatest(periodWork, d => d[1])?.[0];
-    dl.append('dt').text('Most active time of day');
-    dl.append('dd').text(mostWorkPeriod || 'N/A');
+    const stats = [
+      { label: "Commits", value: totalCommits },
+      { label: "Files", value: totalFiles },
+      { label: "Total LOC", value: totalLOC },
+      { label: "Max Depth", value: maxDepth },
+      { label: "Longest Line", value: longestLine },
+      { label: "Max Lines", value: maxLines },
+    ];
+  
+    const container = d3.select("#stats")
+      .append("section")
+      .attr("class", "summary-panel");
+  
+    container.append("h2").text("Summary");
+  
+    const statRow = container.append("div").attr("class", "stat-grid");
+  
+    const cards = statRow.selectAll("div")
+      .data(stats)
+      .enter()
+      .append("div")
+      .attr("class", "stat-card");
+  
+    cards.append("div").attr("class", "stat-label").text(d => d.label.toUpperCase());
+    cards.append("div").attr("class", "stat-value").text(d => d.value);
   }
   
 async function main() {

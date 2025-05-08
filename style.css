@@ -400,23 +400,52 @@ time {
   margin-top: 0.2em;
 }
 
-.stats {
-  margin-top: 1em;
-  padding: 1em;
-  border: 1px solid #ccc;
-  background: #f8f8f8;
-  border-radius: 6px;
-  max-width: 600px;
+/* ===== Summary Stats 卡片横向布局 ===== */
+.summary-panel {
+  padding: 2em 0;
 }
 
-.stats dt {
+.summary-panel h2 {
+  font-size: 2em;
   font-weight: bold;
-  margin-top: 0.5em;
+  margin-bottom: 1.2em;
 }
 
-.stats dd {
-  margin-left: 1em;
-  margin-bottom: 0.5em;
+.stat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3em;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.stat-card {
+  flex: 0 1 auto;
+  text-align: left;
+  min-width: 100px;
+}
+
+.stat-label {
+  font-size: 0.75em;
+  color: #6c757d;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25em;
+}
+
+.stat-value {
+  font-size: 2.2em;
+  font-weight: 600;
+  color: #111;
+}
+
+/* ===== Summary Stats 暗色模式 ===== */
+html[color-scheme="dark"] .stat-label {
+  color: #c4c4c4;
+}
+
+html[color-scheme="dark"] .stat-value {
+  color: #ffffff;
 }
 /* ===== 🌙 暗色模式样式 ===== */
 html[color-scheme="dark"] nav {
