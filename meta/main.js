@@ -67,7 +67,6 @@ function renderCommitInfo(data, commits) {
       .append("section")
       .attr("class", "summary-panel");
   
-    container.append("h2").text("Summary");
   
     const statRow = container.append("div").attr("class", "stat-grid");
   
@@ -88,3 +87,80 @@ async function main() {
 }
   
 main();
+
+function renderScatterPlot(data, commits) {
+    const width = 1000;
+    const height = 600;
+    const margin = { top: 10, right: 10, bottom: 30, left: 40 };
+  
+    const usableArea = {
+      top: margin.top,
+      right: width - margin.right,
+      bottom: height - margin.bottom,
+      left: margin.left,
+      width: width - margin.left - margin.right,
+      height: height - margin.top - margin.bottom,
+    };
+  
+    // Create SVG
+    const svg = d3
+      .select('#chart')
+      .append('svg')
+      .attr('viewBox', `0 0 ${width} ${height}`)
+      .style('overflow', 'visible');
+  
+    // X: time (date)
+    const xScale = d3.scaleTime()
+      .domain(d3.extent(commits, d => d.datetime))
+      .range([usableArea.left, usableArea.right])
+      .nice();
+  
+    // Y: hour (0-24)
+    const yScale = d3.scaleLinear()
+      .domain([0, 24])
+      .range([usableArea.bottom, usableArea.top]);
+  
+    // Color: based on hour
+    const colorScale = d3.scaleSequential()
+      .domain([0, 24])
+      .interpolator(d3.interpolateWarm); // or interpolateCool, interpolatePlasma
+  
+    // Gridlines
+    const gridlines = svg.append('g')
+      .attr('class', 'gridlines')
+      .attr('transform', `translate(${usableArea.left}, 0)`);
+  
+    gridlines.call(
+      d3.axisLeft(yScale).tickFormat('').tickSize(-usableArea.width)
+    );
+  
+    // Axes
+    svg.append('g')
+      .attr('transform', `translate(${usableArea.left}, 0)`)
+      .call(
+        d3.axisLeft(yScale)
+          .tickFormat(d => String(d % 24).padStart(2, '0') + ':00')
+      );
+  
+    svg.append('g')
+      .attr('transform', `translate(0, ${usableArea.bottom})`)
+      .call(d3.axisBottom(xScale));
+  
+    // Dots
+    const dots = svg.append('g').attr('class', 'dots');
+  
+    dots.selectAll('circle')
+      .data(commits)
+      .join('circle')
+      .attr('cx', d => xScale(d.datetime))
+      .attr('cy', d => yScale(d.hourFrac))
+      .attr('r', 4)
+      .attr('fill', d => colorScale(d.hourFrac))
+      .attr('opacity', 0.8);
+  }
+
+  let data = await loadData();
+  let commits = processCommits(data);
+  
+  renderCommitInfo(data, commits);
+  renderScatterPlot(data, commits);
