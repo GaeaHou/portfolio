@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xuebing Hou: Personal site and portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="global.js"></script>
+</head>
+<body>
+    <h1>Xuebing Hou</h1>
+    <p>Welcome to my personal site and portfolio. I am a junior student in SUSTech and now studying in UCSD as an UPS student.</p>
+    <img src="./images/me.JPG" alt="This is me!" style="display: block; margin: 0 auto; max-width:50%; height:auto;">
+    <h2>Latest Projects</h2>
+    <div class="projects"></div>
+    <div id="profile-stats"></div>
+    <style>
+        #profile-stats dl {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          text-align: center;
+        }
+        #profile-stats dt {
+          font-weight: bold;
+          grid-row: 1;
+        }
+        #profile-stats dd {
+          margin: 0;
+          grid-row: 2;
+        }
+      </style>
+      <script src="./global.js" type="module"></script>
+      <script src="./index.js" type="module"></script>
+</body>
+</html>

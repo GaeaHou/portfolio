@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Project 2 Report</title>
+    <style>
+      :root {
+        --color-neutral-95: hsl(220 10% 95%);
+        --color-neutral-90: hsl(220 10% 90%);
+        --color-neutral-80: hsl(220 10% 80%);
+        --color-neutral-70: hsl(220 10% 70%);
+        --color-neutral-60: hsl(220 10% 60%);
+        --color-neutral-50: hsl(220 10% 50%);
+        --color-neutral-40: hsl(220 10% 40%);
+        --color-neutral-30: hsl(220 10% 30%);
+        --color-neutral-20: hsl(220 10% 20%);
+        --color-neutral-10: hsl(220 10% 10%);
+      }
+
+      html {
+        font: 100%/1.5 system-ui;
+        counter-reset: figure;
+        background: var(--color-neutral-95);
+        max-width: min(75vw, 80em);
+        margin: 0 auto;
+      }
+
+      /* Headings */
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        line-height: 1.1;
+        font-weight: 600;
+        text-wrap: balance;
+      }
+
+      h1,
+      h2 {
+        border-bottom: 1px solid var(--color-neutral-80);
+        padding-bottom: 0.2em;
+      }
+
+      h1 {
+        margin-block: 1em 0.5rem;
+        font-size: clamp(2.5em, 150% + 2vh + 2vw, 10vmin);
+        font-weight: 800;
+
+        small {
+          display: block;
+          width: fit-content;
+          padding: 0.2em 0.5em;
+          margin-inline: auto;
+          color: white;
+          background: var(--color-neutral-40);
+          font-size: 40%;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+      }
+
+      h2 {
+        font-size: 180%;
+        color: var(--color-neutral-30);
+      }
+
+      h3 {
+        font-size: 130%;
+      }
+
+      /* Lists */
+
+      ul,
+      ol {
+        padding-inline-start: 2em;
+      }
+
+      li {
+        &::marker {
+          color: var(--color-neutral-40);
+        }
+
+        + li {
+          margin-top: 0.2em;
+        }
+      }
+
+      /* Sectioning elements */
+
+      header {
+        padding-block: 1em;
+        text-align: center;
+      }
+
+      main {
+        background: white;
+        color: var(--color-neutral-20);
+        border-radius: 1rem;
+        padding: 0.1rem 2rem;
+      }
+
+      /* Figures */
+
+      figure {
+        margin: 1em 0;
+        padding: 0.5rem;
+        margin-inline: -0.5em;
+        border: 1px solid var(--color-neutral-80);
+        box-shadow: 0 0.1em 0.2em var(--color-neutral-95);
+        text-align: center;
+        background: white;
+
+        > figcaption {
+          font: 500 75% var(--font-sans);
+          background: var(--color-neutral-95);
+          padding: 0.5rem;
+          margin: -0.5rem;
+          margin-top: 0.5rem;
+          counter-increment: figure;
+          text-align: left;
+
+          &::before {
+            content: 'Figure ' counter(figure) ': ';
+            font-weight: bold;
+            color: var(--color-neutral-40);
+          }
+
+          a:not(:hover, :focus, :active) {
+            color: inherit;
+            text-decoration: underline;
+            text-decoration-color: color-mix(
+              in lab,
+              currentColor,
+              transparent 70%
+            );
+          }
+        }
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>
+        <small>Assignment 4</small>
+        Persuasive or Deceptive Visualization?
+      </h1>
+
+      <p><strong>Xuebing Hou</strong> — <em>ax010060@acsmail.ucsd.edu</em></p>
+    </header>
+
+    <main>
+      <h2>Proposition: Gender gaps in primary education (including both primary and lower secondary schooling) have largely closed worldwide.</h2>
+
+      <section>
+        <h3>FOR the Proposition</h3>
+
+        <figure>
+          <img src="/portfolio/projects/1.png" alt="World Map and Primary Enrollment Line Chart" />
+          <figcaption>Visualizations showing gender gap trends in primary school enrollment from 2000 to 2020, highlighting the convergence toward gender parity across selected regions.</figcaption>
+        </figure>
+
+        <p>Design Decisions and Rationale:</p>
+
+        <ul>
+          <li>
+            <strong>Score: -1 (mildly deceptive)</strong><br>
+            I used a tight Y-axis range to visually exaggerate small differences in gender enrollment rates, helping to emphasize the convergence trend. This made even minor gains look more significant, supporting the narrative of progress. I considered using a standard 0–100% range but found it visually less compelling and the large whitespace less aesthetically pleasing.
+          </li>
+        
+          <li>
+            <strong>Score: -0.5 (slightly deceptive)</strong><br>
+            The visualization includes only primary education and excludes secondary data, which may give a partial picture of "basic education." This decision made it easier to argue that gender gaps have closed. Including secondary data would have added complexity and potentially undermined the main proposition.
+          </li>
+        
+          <li>
+            <strong>Score: +2 (fully earnest)</strong><br>
+            I combined a world map and a line chart to visually convey both geographical coverage and enrollment trends. This dual-format helped situate local patterns within a global context, reinforcing the argument that progress has been widespread. It balances exploration and storytelling effectively.
+          </li>
+        
+          <li>
+            <strong>Score: +2 (fully earnest)</strong><br>
+            Neutral green and yellow tones were selected to avoid associating data with culturally gendered colors like pink or blue. This helped maintain viewer focus on the trend itself rather than unconsciously introducing gender bias. I rejected more saturated or emotional color palettes for this reason.
+          </li>
+        
+          <li>
+            <strong>Score: +1.5 (mostly earnest)</strong><br>
+            Final-year enrollment gaps were directly labeled on the chart to guide attention toward recent outcomes. This enhances clarity without obscuring trends. While it draws the viewer to a specific moment, it’s a fair way to support the message of near gender parity.
+          </li>
+        </ul>
+        
+        <p><strong>Overall Deception Score for this visualization:</strong> +1 (mostly earnest)</p>
+      </section>
+
+      <section>
+        <h3>Interactive Exploration: Gender Gaps by Country</h3>
+        <p>
+          Use the button below to toggle an interactive visualization of gender gap trends in primary school enrollment (2000–2020) for different countries.  
+          Due to data availability, some countries may appear with incomplete or missing data in the chart.
+        </p>
+      
+        <button onclick="toggleChart()" style="padding: 0.5rem 1rem; border-radius: 5px; background-color: #4682B4; color: white; border: none; cursor: pointer;">
+          Show Interactive Chart
+        </button>
+      
+        <div id="interactiveChart" style="margin-top: 1rem; display: none;"></div>
+      
+        <script>
+          let chartVisible = false;
+          function toggleChart() {
+            const chartDiv = document.getElementById('interactiveChart');
+            const button = event.currentTarget;
+            chartVisible = !chartVisible;
+      
+            if (chartVisible) {
+              // 重新插入 iframe
+              chartDiv.innerHTML = `
+                <iframe src="/portfolio/projects/interactive_gender_gap.html"
+                        width="100%" height="550"
+                        style="border: none; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.1);">
+                </iframe>`;
+              chartDiv.style.display = 'block';
+              button.textContent = 'Hide Interactive Chart';
+            } else {
+              // 清除 iframe
+              chartDiv.innerHTML = '';
+              chartDiv.style.display = 'none';
+              button.textContent = 'Show Interactive Chart';
+            }
+          }
+        </script>
+      </section>
+
+      <section>
+        <h3>AGAINST the Proposition</h3>
+      
+        <figure>
+          <img src="/portfolio/projects/2.png" alt="Bar Chart of Secondary Education Gender Gap" />
+          <figcaption>Bar chart and accompanying table highlighting the top five countries with the largest gender gaps in lower secondary education enrollment, where females significantly lag behind males.</figcaption>
+        </figure>
+      
+        <p>Design Decisions and Rationale:</p>
+      
+        <ul>
+          <li>
+            <strong>Score: -1.5 (deceptive)</strong><br>
+            I chose to highlight only the five countries with the worst gender gaps in lower secondary enrollment, intentionally ignoring global averages and improvements. This selection amplifies the sense of inequality. A more balanced alternative would include global context or regional comparisons.
+          </li>
+        
+          <li>
+            <strong>Score: -1 (deceptive)</strong><br>
+            The chart uses red for female and blue for male bars, reinforcing traditional gender colors and possibly triggering emotional responses. This was designed to enhance salience of the gap. I debated using neutral tones but chose emotional contrast for rhetorical effect.
+          </li>
+        
+          <li>
+            <strong>Score: -1 (deceptive)</strong><br>
+            I included a global male average reference line but deliberately excluded a corresponding female average, skewing interpretation. This makes the female performance appear weaker by comparison. Adding both lines would be fairer but less persuasive for the AGAINST stance.
+          </li>
+        
+          <li>
+            <strong>Score: +2 (fully earnest)</strong><br>
+            A summary table alongside the chart clearly shows each country’s gender gap and the global average. This quantitative supplement adds transparency and supports viewers in comparing values independently. It balances the emotional tone of the chart with concrete data.
+          </li>
+        
+          <li>
+            <strong>Score: +2 (fully earnest)</strong><br>
+            The Y-axis scale remains fixed from 0% to 100%, accurately representing proportion and avoiding distortion. This ensures viewers perceive the differences as they are. I did not truncate the scale to avoid artificially inflating disparities.
+          </li>
+        </ul>
+      
+        <p><strong>Overall Deception Score for this visualization:</strong> -0.5 (slightly deceptive)</p>
+      </section>
+
+      <section>
+        <h2>Final Reflection</h2>
+      
+        <p>
+          This project challenged me to explore the persuasive power of visual framing. On a technical level, creating the FOR visualization was relatively straightforward, as it involved combining a world map and a line chart to highlight trends in primary education enrollment. The AGAINST visualization was more difficult, particularly in deciding how to frame inequality without appearing overtly manipulative. Designing a side-by-side chart and table required careful layout balance to maintain clarity and credibility.
+        </p>
+      
+        <p>
+          What surprised me most was how effectively the same dataset could support opposing arguments, depending on which data segments were included, emphasized, or omitted. The ability to rhetorically shift focus—such as framing "basic education" narrowly (only primary) or broadly (including lower secondary)—allowed me to construct two compelling but contrasting narratives. I also realized the ethical implications of such segmentation: even if data is technically truthful, selective framing can distort perception. For example, omitting secondary education from a global discussion on education equity hides significant disparities, while isolating the worst-performing countries exaggerates them.
+        </p>
+      
+        <p>
+          I now define ethical analysis and visualization as a dual responsibility: representing data accurately and transparently, while clearly disclosing framing decisions that affect interpretation. Acceptable persuasion provides necessary context and empowers viewers to form their own judgments. Misleading choices, by contrast, obscure important context, exaggerate emotional impact, or present partial views as complete. This project reinforced that ethical visualization is not only about data integrity, but about fairness in how the story around that data is told.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anesthesia Visualization (First 500 Cases)</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        select {
+            width: 200px;
+            height: 80px;
+            margin-right: 20px;
+        }
+        .chart-container {
+            margin-bottom: 40px;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .tooltip {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 5px;
+            pointer-events: none;
+            opacity: 0;
+        }
+        svg {
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Anesthesia Visualization (First 500 Cases)</h1>
+    <div class="controls">
+        <label for="anetype-select">Select Anesthesia Types:</label>
+        <select id="anetype-select" multiple></select>
+        
+        <label for="drug-select">Select Drugs:</label>
+        <select id="drug-select" multiple>
+            <option value="sevoflurane">Sevoflurane</option>
+            <option value="desflurane">Desflurane</option>
+            <option value="propofol_tci">Propofol TCI</option>
+            <option value="remifentanil_tci">Remifentanil TCI</option>
+        </select>
+
+        <label for="sbp-select">Select SBP Statistic:</label>
+        <select id="sbp-select">
+            <option value="min_sbp">Min SBP</option>
+            <option value="mean_sbp">Mean SBP</option>
+            <option value="max_sbp">Max SBP</option>
+        </select>
+
+        <label for="map-select">Select MAP Statistic:</label>
+        <select id="map-select">
+            <option value="min_map">Min MAP</option>
+            <option value="mean_map">Mean MAP</option>
+            <option value="max_map">Max MAP</option>
+        </select>
+    </div>
+
+    <div class="chart-container" id="freq-duration-chart">
+        <h2>Anesthesia Type Frequency and Average Duration</h2>
+        <div id="freq-duration"></div>
+    </div>
+
+    <div class="chart-container" id="grid-charts">
+        <h2>Physiological Indicators (First 10 Min)</h2>
+        <div class="grid-container">
+            <div id="scatter-sbp"></div>
+            <div id="scatter-map"></div>
+            <div id="scatter-hr-std"></div>
+            <div id="bar-hypotension"></div>
+        </div>
+    </div>
+
+    <script>
+        // Load data
+        d3.csv("summary_with_all_stats.csv").then(rawData => {
+            // Parse data
+            rawData.forEach(d => {
+                d.min_sbp = +d.min_sbp;
+                d.mean_sbp = +d.mean_sbp;
+                d.max_sbp = +d.max_sbp;
+                d.min_map = +d.min_map;
+                d.mean_map = +d.mean_map;
+                d.max_map = +d.max_map;
+                d.mean_hr = +d.mean_hr;
+                d.max_hr = +d.max_hr;
+                d.hr_std = +d.hr_std;
+                d.hypotension = +d.hypotension;
+                d.ane_duration = +d.ane_duration;
+                d.sevoflurane = +d.sevoflurane;
+                d.desflurane = +d.desflurane;
+                d.propofol_tci = +d.propofol_tci;
+                d.remifentanil_tci = +d.remifentanil_tci;
+            });
+
+            // Filter for frequency chart (minimal filtering)
+            const freqData = rawData.filter(d => d.ane_type && !isNaN(d.ane_duration));
+
+            // Filter for physiological charts (strict filtering)
+            const physData = rawData.filter(d => !isNaN(d.min_sbp) && d.min_sbp > 0 &&
+                                               !isNaN(d.mean_sbp) && d.mean_sbp > 0 &&
+                                               !isNaN(d.max_sbp) && d.max_sbp > 0 &&
+                                               !isNaN(d.min_map) && d.min_map > 0 &&
+                                               !isNaN(d.mean_map) && d.mean_map > 0 &&
+                                               !isNaN(d.max_map) && d.max_map > 0 &&
+                                               !isNaN(d.hr_std) && d.hr_std > 0 &&
+                                               !isNaN(d.hypotension));
+
+            // Define all possible anesthesia types for frequency chart
+            const allAneTypes = ["General", "Spinal", "Sedationalgesia"];
+
+            // Get dynamic anesthesia types for physiological charts
+            const physAneTypes = [...new Set(physData.map(d => d.ane_type))];
+
+            // Populate anesthesia type options
+            const aneTypeSelect = d3.select("#anetype-select");
+            allAneTypes.forEach(type => {
+                aneTypeSelect.append("option").text(type).attr("value", type);
+            });
+
+            // Function to get selected values
+            function getSelectedValues(selectId) {
+                return Array.from(document.querySelector(selectId).selectedOptions).map(opt => opt.value);
+            }
+
+            // Filter data for frequency chart
+            function filterFreqData() {
+                const selectedAneTypes = getSelectedValues("#anetype-select");
+                const selectedDrugs = getSelectedValues("#drug-select");
+
+                return freqData.filter(d => {
+                    const aneTypeMatch = selectedAneTypes.length === 0 || selectedAneTypes.includes(d.ane_type);
+                    const drugMatch = selectedDrugs.length === 0 || selectedDrugs.every(drug => d[drug] == 1);
+                    return aneTypeMatch && drugMatch;
+                });
+            }
+
+            // Filter data for physiological charts
+            function filterPhysData() {
+                const selectedAneTypes = getSelectedValues("#anetype-select");
+                const selectedDrugs = getSelectedValues("#drug-select");
+
+                return physData.filter(d => {
+                    const aneTypeMatch = selectedAneTypes.length === 0 || selectedAneTypes.includes(d.ane_type);
+                    const drugMatch = selectedDrugs.length === 0 || selectedDrugs.every(drug => d[drug] == 1);
+                    return aneTypeMatch && drugMatch;
+                });
+            }
+
+            // Update all charts
+            function updateCharts() {
+                const filteredFreqData = filterFreqData();
+                const filteredPhysData = filterPhysData();
+                updateFreqDurationChart(filteredFreqData);
+                updateScatterPlot(filteredPhysData, d3.select("#sbp-select").property("value"), "#scatter-sbp", "SBP");
+                updateScatterPlot(filteredPhysData, d3.select("#map-select").property("value"), "#scatter-map", "MAP");
+                updateScatterPlot(filteredPhysData, "hr_std", "#scatter-hr-std", "HR Std");
+                updateBarChart(filteredPhysData);
+            }
+
+            // Frequency and Duration Chart
+            function updateFreqDurationChart(data) {
+                d3.select("#freq-duration").selectAll("*").remove();
+
+                const margin = {top: 40, right: 30, bottom: 50, left: 60};
+                const width = 600 - margin.left - margin.right;
+                const height = 400 - margin.top - margin.bottom;
+
+                const svg = d3.select("#freq-duration")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                const x = d3.scaleBand()
+                    .domain(allAneTypes)
+                    .range([0, width])
+                    .padding(0.2);
+
+                const yFreq = d3.scaleLinear()
+                    .domain([0, d3.max(allAneTypes.map(t => data.filter(d => d.ane_type === t).length)) || 1])
+                    .range([height, 0]);
+
+                const yDur = d3.scaleLinear()
+                    .domain([0, d3.max(allAneTypes.map(t => d3.mean(data.filter(d => d.ane_type === t), d => d.ane_duration)) || 0) * 1.2 || 1])
+                    .range([height, 0]);
+
+                svg.append("g")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x))
+                    .selectAll("text")
+                    .attr("transform", "rotate(-45)")
+                    .style("text-anchor", "end");
+
+                svg.append("g")
+                    .call(d3.axisLeft(yFreq).tickFormat(d3.format(".0f")));
+
+                svg.append("g")
+                    .attr("transform", `translate(${width},0)`)
+                    .call(d3.axisRight(yDur).tickFormat(d3.format(".0f")));
+
+                // Bars (Frequency)
+                allAneTypes.forEach(type => {
+                    const freq = data.filter(d => d.ane_type === type).length;
+                    svg.append("rect")
+                        .attr("x", x(type))
+                        .attr("y", yFreq(freq))
+                        .attr("width", x.bandwidth())
+                        .attr("height", height - yFreq(freq))
+                        .attr("fill", "skyblue")
+                        .attr("opacity", 0.8);
+                });
+
+                // Line (Average Duration)
+                const durations = allAneTypes.map(type => d3.mean(data.filter(d => d.ane_type === type), d => d.ane_duration) || 0);
+                const line = d3.line()
+                    .x((d, i) => x(allAneTypes[i]) + x.bandwidth() / 2)
+                    .y((d, i) => yDur(durations[i]));
+
+                svg.append("path")
+                    .datum(durations)
+                    .attr("fill", "none")
+                    .attr("stroke", "red")
+                    .attr("stroke-width", 2)
+                    .attr("d", line);
+
+                // Labels
+                svg.append("text")
+                    .attr("x", width / 2)
+                    .attr("y", -10)
+                    .attr("text-anchor", "middle")
+                    .text("Anesthesia Type Frequency and Average Duration (First 500 Cases)");
+
+                svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", -margin.left + 20)
+                    .attr("x", -height / 2)
+                    .attr("text-anchor", "middle")
+                    .text("Frequency");
+
+                svg.append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", width + margin.right - 20)
+                    .attr("x", -height / 2)
+                    .attr("text-anchor", "middle")
+                    .text("Average Duration (min)");
+            }
+
+            // Scatter Plot with Mean Line
+            function updateScatterPlot(data, yField, containerId, title) {
+                d3.select(containerId).selectAll("*").remove();
+
+                const margin = {top: 40, right: 30, bottom: 50, left: 60};
+                const width = 400 - margin.left - margin.right;
+                const height = 300 - margin.top - margin.bottom;
+
+                const svg = d3.select(containerId)
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                // Use dynamic aneTypes based on filtered data
+                const currentAneTypes = [...new Set(data.map(d => d.ane_type))];
+
+                const x = d3.scaleBand()
+                    .domain(currentAneTypes)
+                    .range([0, width])
+                    .padding(0.2);
+
+                const yMax = d3.max(data, d => d[yField]) * 1.1 || 200;
+                const y = d3.scaleLinear()
+                    .domain([0, yMax])
+                    .range([height, 0]);
+
+                svg.append("g")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x))
+                    .selectAll("text")
+                    .attr("transform", "rotate(-45)")
+                    .style("text-anchor", "end");
+
+                svg.append("g")
+                    .call(d3.axisLeft(y));
+
+                const tooltip = d3.select("body").append("div")
+                    .attr("class", "tooltip")
+                    .style("opacity", 0);
+
+                const drugColors = {
+                    sevoflurane: "red",
+                    desflurane: "blue",
+                    propofol_tci: "green",
+                    remifentanil_tci: "purple"
+                };
+
+                // Filter valid data points for this yField
+                const validData = data.filter(d => !isNaN(d[yField]) && d[yField] > 0);
+                validData.forEach(d => {
+                    let color = "gray";
+                    for (const drug in drugColors) {
+                        if (d[drug] == 1) {
+                            color = drugColors[drug];
+                            break;
+                        }
+                    }
+
+                    svg.append("circle")
+                        .attr("cx", x(d.ane_type) + x.bandwidth() / 2 + (Math.random() - 0.5) * x.bandwidth() * 0.8)
+                        .attr("cy", y(d[yField]))
+                        .attr("r", 4)
+                        .attr("fill", color)
+                        .on("mouseover", function(event) {
+                            tooltip.transition().duration(200).style("opacity", 0.9);
+                            tooltip.html(`Case ID: ${d.caseid}<br>${title}: ${d[yField].toFixed(2)}`)
+                                .style("left", (event.pageX + 10) + "px")
+                                .style("top", (event.pageY - 28) + "px");
+                        })
+                        .on("mouseout", function() {
+                            tooltip.transition().duration(500).style("opacity", 0);
+                        });
+                });
+
+                const means = d3.rollup(validData, v => d3.mean(v, d => d[yField]), d => d.ane_type);
+                currentAneTypes.forEach(type => {
+                    if (means.has(type)) {
+                        const meanValue = means.get(type);
+                        svg.append("line")
+                            .attr("x1", x(type))
+                            .attr("x2", x(type) + x.bandwidth())
+                            .attr("y1", y(meanValue))
+                            .attr("y2", y(meanValue))
+                            .attr("stroke", "black")
+                            .attr("stroke-width", 2);
+                    }
+                });
+
+                svg.append("text")
+                    .attr("x", width / 2)
+                    .attr("y", -10)
+                    .attr("text-anchor", "middle")
+                    .text(title);
+            }
+
+            // Bar Chart for Hypotension
+            function updateBarChart(data) {
+                d3.select("#bar-hypotension").selectAll("*").remove();
+
+                const margin = {top: 40, right: 30, bottom: 50, left: 60};
+                const width = 400 - margin.left - margin.right;
+                const height = 300 - margin.top - margin.bottom;
+
+                const svg = d3.select("#bar-hypotension")
+                    .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                // Use dynamic aneTypes based on filtered data
+                const currentAneTypes = [...new Set(data.map(d => d.ane_type))];
+
+                const x = d3.scaleBand()
+                    .domain(currentAneTypes)
+                    .range([0, width])
+                    .padding(0.2);
+
+                const y = d3.scaleLinear()
+                    .domain([0, 1])
+                    .range([height, 0]);
+
+                svg.append("g")
+                    .attr("transform", `translate(0,${height})`)
+                    .call(d3.axisBottom(x))
+                    .selectAll("text")
+                    .attr("transform", "rotate(-45)")
+                    .style("text-anchor", "end");
+
+                svg.append("g")
+                    .call(d3.axisLeft(y).tickFormat(d3.format(".0%")));
+
+                const validData = data.filter(d => !isNaN(d.hypotension));
+                const proportions = d3.rollup(validData, v => d3.mean(v, d => d.hypotension), d => d.ane_type);
+                currentAneTypes.forEach(type => {
+                    const proportion = proportions.get(type) || 0;
+                    svg.append("rect")
+                        .attr("x", x(type))
+                        .attr("y", y(proportion))
+                        .attr("width", x.bandwidth())
+                        .attr("height", height - y(proportion))
+                        .attr("fill", "salmon");
+                });
+
+                svg.append("text")
+                    .attr("x", width / 2)
+                    .attr("y", -10)
+                    .attr("text-anchor", "middle")
+                    .text("Hypotension Proportion");
+            }
+
+            // Initial render
+            updateCharts();
+
+            // Event listeners
+            d3.select("#anetype-select").on("change", updateCharts);
+            d3.select("#drug-select").on("change", updateCharts);
+            d3.select("#sbp-select").on("change", updateCharts);
+            d3.select("#map-select").on("change", updateCharts);
+        });
+    </script>
+</body>
+</html>

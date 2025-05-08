@@ -1,0 +1,89 @@
+[
+    {
+        "title": "Anesthesia Type Distribution and Average Duration Across Cases",
+        "year": "2025",
+        "image": "/portfolio/projects/image.png",
+        "description": "This chart shows the distribution of anesthesia types and their average durations. Click on a bar to view detailed information.",
+        "link": "/portfolio/projects/plot.html"
+    },
+
+    {
+        "title": "Global Gender Gap in Primary Education",
+        "year": "2025",
+        "image": "/portfolio/projects/1.png",
+        "description": "This project explores how visualizations reveal or obscure gender gaps in global primary education using world maps and enrollment trend analysis.",
+        "link": "/portfolio/projects/project2_report.html"
+    },
+    {
+        "title": "Lorem ipsum dolor sit.",
+        "year": "2024",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Lorem ipsum dolor sit amet consectetur adipisicing elit. Magni ullam neque provident dolor, quis, assumenda voluptatum placeat, ducimus repudiandae fuga earum maiores doloremque rerum nihil numquam ratione necessitatibus ab expedita!"
+    },
+    {
+        "title": "Asperiores mollitia quod amet!",
+        "year": "2024",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Fugiat facilis quia saepe quibusdam corrupti, rem, temporibus ut recusandae et dolorem accusamus! Molestias, vero id. Quam, nemo animi maxime deleniti dolor laborum dicta quas, esse nostrum inventore natus illum."
+    },
+    {
+        "title": "Excepturi aperiam et sed.",
+        "year": "2022",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Atque esse nihil perferendis. Sapiente omnis cumque voluptates officiis pariatur provident laborum explicabo repudiandae labore doloribus minus beatae iusto optio, nulla ducimus, ullam magni. Consequuntur pariatur quas vel earum blanditiis."
+    },
+    {
+        "title": "Itaque eveniet fuga voluptas.",
+        "year": "2023",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Quos, quibusdam. Modi minus, debitis nihil autem reiciendis adipisci laudantium dolorem. Temporibus facilis eligendi et saepe aliquam nulla in consequatur optio ipsam nobis, ut, voluptatibus non eum exercitationem facere laborum!"
+    },
+    {
+        "title": "Molestias impedit et dolor.",
+        "year": "2023",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Cum dolor neque quo maxime quasi debitis voluptates autem ullam temporibus obcaecati sapiente omnis a, eos excepturi assumenda numquam facilis iste atque perferendis eum! Cumque atque maxime sequi delectus dolor."
+    },
+    {
+        "title": "Consequatur possimus eveniet quod?",
+        "year": "2022",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Consectetur, maiores magni? Distinctio soluta, tempora similique saepe quasi quas consectetur quidem, tenetur adipisci consequatur asperiores voluptatibus sunt quo neque, officiis dolor sequi. Quisquam, ut! Earum consectetur adipisci rerum maxime."
+    },
+    {
+        "title": "Vitae magnam corporis expedita.",
+        "year": "2025",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Omnis minus doloribus provident repellat! Tempore iure eveniet rem amet officiis voluptas molestias corporis, voluptatem at dolore porro, qui minima praesentium molestiae quisquam dignissimos unde. Tempora minus accusamus molestias debitis."
+    },
+    {
+        "title": "Illum repudiandae esse maxime?",
+        "year": "2024",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Reprehenderit adipisci mollitia molestias repellendus? Dolorem iusto nam doloremque fugiat tempora quae dolore dolores amet officia ut provident recusandae esse maxime voluptatem, labore officiis, explicabo accusantium exercitationem nihil voluptate. Illum."
+    },
+    {
+        "title": "Nisi doloribus iusto adipisci?",
+        "year": "2022",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Facilis eius veniam modi eum placeat illum vitae, tempore labore ducimus iure praesentium quae accusamus cupiditate minus mollitia quibusdam maxime, tempora, reprehenderit pariatur sunt. Incidunt ratione soluta dolore quis ex."
+    },
+    {
+        "title": "Nulla saepe pariatur nobis.",
+        "year": "2023",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Non voluptate accusamus nam molestias eum cumque iusto consequatur quasi, voluptatum minima iste expedita assumenda, dolore sunt obcaecati illo. Ipsa quibusdam porro natus, quam sit necessitatibus possimus aspernatur cumque dolor!"
+    },
+    {
+        "title": "Ratione aliquid distinctio eaque.",
+        "year": "2024",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "In ducimus enim perferendis velit eligendi neque error animi, numquam ea totam cupiditate quasi illum aut autem facilis deleniti ipsa debitis. Sapiente possimus inventore modi beatae rem illo voluptates est!"
+    },
+    {
+        "title": "Illo perspiciatis ipsa dignissimos.",
+        "year": "2023",
+        "image": "https://vis-society.github.io/labs/2/images/empty.svg",
+        "description": "Suscipit officia nesciunt doloribus incidunt? Dolores inventore accusamus nulla ex dolorem eius cupiditate, itaque rem fuga est culpa consectetur nobis necessitatibus natus exercitationem adipisci minima illo, non consequatur vero reiciendis?"
+    }
+]
