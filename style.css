@@ -509,6 +509,41 @@ circle.selected {
   animation: marching-ants 2s linear infinite;
 }
 
+#selection-count {
+  font-size: 1.1em;
+  font-weight: bold;
+  margin: 2em 0 1em 0;
+  text-align: center;
+}
+
+.language-breakdown-grid {
+  display: flex;
+  justify-content: center;
+  gap: 3em;
+  text-align: center;
+  font-family: sans-serif;
+}
+
+.lang-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3em;
+}
+
+.lang-name {
+  font-weight: 700;
+  font-size: 1.2em;
+}
+
+.lang-lines {
+  font-size: 1em;
+}
+
+.lang-percent {
+  font-size: 0.95em;
+  color: #555;
+}
+
 @keyframes marching-ants {
   to {
     stroke-dashoffset: -8;

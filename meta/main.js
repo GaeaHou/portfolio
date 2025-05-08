@@ -240,26 +240,29 @@ function renderCommitInfo(data, commits) {
     }
   
     function renderLanguageBreakdown(selection) {
-      const selectedCommits = selection
-        ? commits.filter((d) => isCommitSelected(selection, d))
-        : [];
-      const container = document.getElementById('language-breakdown');
-  
-      if (selectedCommits.length === 0) {
+        const selectedCommits = selection
+          ? commits.filter((d) => isCommitSelected(selection, d))
+          : [];
+        const container = document.getElementById('language-breakdown');
         container.innerHTML = '';
-        return;
+      
+        if (selectedCommits.length === 0) return;
+      
+        const lines = selectedCommits.flatMap((d) => d.lines);
+        const breakdown = d3.rollup(lines, v => v.length, d => d.type);
+      
+        for (const [lang, count] of breakdown) {
+          const proportion = count / lines.length;
+          const langDiv = document.createElement('div');
+          langDiv.className = 'lang-block';
+          langDiv.innerHTML = `
+            <div class="lang-name">${lang.toUpperCase()}</div>
+            <div class="lang-lines">${count} lines</div>
+            <div class="lang-percent">(${d3.format('.1~%')(proportion)})</div>
+          `;
+          container.appendChild(langDiv);
+        }
       }
-  
-      const lines = selectedCommits.flatMap((d) => d.lines);
-      const breakdown = d3.rollup(lines, v => v.length, d => d.type);
-      container.innerHTML = '';
-      for (const [lang, count] of breakdown) {
-        const proportion = count / lines.length;
-        container.innerHTML += `
-          <dt>${lang}</dt>
-          <dd>${count} lines (${d3.format('.1~%')(proportion)})</dd>`;
-      }
-    }
   
     function brushed(event) {
       const selection = event.selection;
