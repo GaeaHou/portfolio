@@ -9,42 +9,39 @@
   <script type="module" src="./main.js"></script>
 </head>
 <body>
+
   <section class="summary-panel">
-    <h1><Meta></h1>
+    <h1>&lt;Meta&gt;</h1>
     <div class="stat-grid" id="stats"></div>
   </section>
+
+
+  <h2 id="chart-title">Commits by time of day</h2>
+
+  <div id="chart"></div>
 
   <p id="selection-count">No commits selected</p>
   <div id="language-breakdown" class="language-columns">
     <div class="lang-block">
-      <div class="lang-name"></div>
-      <div class="lang-lines"></div>
-      <div class="lang-percent"></div>
+      <div class="lang-name">–</div>
+      <div class="lang-lines">–</div>
+      <div class="lang-percent">(–)</div>
     </div>
   </div>
 
-  
-
-  <h2>Commits by time of day</h2>
-
-  <div id="chart"></div>
-  <dl id="language-breakdown" class="stats"></dl>
-
+  <!-- ✅ 5. Tooltip -->
   <dl id="commit-tooltip" class="info tooltip" hidden>
     <dt>Commit</dt>
     <dd><a href="" id="commit-link" target="_blank"></a></dd>
-
     <dt>Date</dt>
     <dd id="commit-date"></dd>
-
     <dt>Time</dt>
     <dd id="commit-time"></dd>
-
     <dt>Author</dt>
     <dd id="commit-author"></dd>
-
     <dt>Lines edited</dt>
     <dd id="commit-lines"></dd>
   </dl>
+
 </body>
 </html>
