@@ -1,5 +1,13 @@
 [
     {
+        "title": "Geospatial visualizations ———— Bikewatching",
+        "year": "2025",
+        "image": "/portfolio/projects/map.png",
+        "description": "This chart shows the map and bike related information of Cambridge and Boston.",
+        "link": "https://gaeahou.github.io/DCS106-lab7"
+    },
+
+    {
         "title": "Anesthesia Type Distribution and Average Duration Across Cases",
         "year": "2025",
         "image": "/portfolio/projects/image.png",
