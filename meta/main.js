@@ -344,3 +344,25 @@ function renderLanguageBreakdown(selection) {
   }
   
 main();
+let commitProgress = 100;
+let timeScale = d3.scaleTime(
+  [d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)],
+  [0, 100]
+);
+
+const slider = d3.select('#commit-slider');
+const selectedTime = d3.select('#selectedTime');
+
+selectedTime.text(timeScale.invert(commitProgress).toLocaleString("en-US", {
+  dateStyle: "long",
+  timeStyle: "short"
+}));
+
+slider.on('input', function () {
+  commitProgress = +this.value;
+  const date = timeScale.invert(commitProgress);
+  selectedTime.text(date.toLocaleString("en-US", {
+    dateStyle: "long",
+    timeStyle: "short"
+  }));
+});
