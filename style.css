@@ -806,3 +806,64 @@ html[color-scheme="dark"] .color-scheme {
   background-color: rgba(30, 30, 30, 0.85) !important;
   color: white;
 }
+
+/* ===== 滑动条容器样式 ===== */
+.slider-container {
+  display: flex;
+  align-items: baseline;
+  margin-top: 1em;
+  margin-bottom: 2em;
+  width: 100%;
+  max-width: 100ch; /* 与页面内容宽度一致 */
+}
+
+.slider-label {
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  gap: 1em; /* 标签、滑动条和时间之间的间距 */
+  width: 100%;
+}
+
+#time-slider {
+  flex: 1; /* 滑动条占据剩余空间 */
+  min-width: 300px; /* 最小宽度，确保滑动条足够长 */
+  max-width: 600px; /* 最大宽度，防止过长 */
+}
+
+#selectedTime {
+  margin-left: auto; /* 时间靠右对齐 */
+  font-size: 0.9em;
+}
+
+/* 调整滑动条外观（可选，增强视觉效果） */
+#time-slider::-webkit-slider-thumb {
+  background: #007acc; /* 亮色模式下滑动条手柄颜色 */
+  cursor: pointer;
+}
+
+#time-slider::-moz-range-thumb {
+  background: #007acc;
+  cursor: pointer;
+}
+
+/* 暗色模式下滑动条手柄颜色 */
+html[color-scheme="dark"] #time-slider::-webkit-slider-thumb {
+  background: #37996b;
+}
+
+html[color-scheme="dark"] #time-slider::-moz-range-thumb {
+  background: #37996b;
+}
+
+/* 媒体查询后备，确保自动模式下暗色模式样式生效 */
+@media (prefers-color-scheme: dark) {
+  html:not([color-scheme="light"]) {
+    #time-slider::-webkit-slider-thumb {
+      background: #37996b;
+    }
+    #time-slider::-moz-range-thumb {
+      background: #37996b;
+    }
+  }
+}
