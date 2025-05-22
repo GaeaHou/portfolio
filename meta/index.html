@@ -17,10 +17,12 @@
 
 
   <h2 id="chart-title">Commits by time of day</h2>
-  <div id="commit-filter-bar" style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1rem;">
-    <label for="commit-slider">Show commits until:</label>
-    <input id="commit-slider" type="range" min="0" max="100" value="100" style="flex: 2;">
-    <time id="selectedTime" style="margin-left: auto;"></time>
+  <div style="display: flex; align-items: baseline; flex: 1;">
+    <label for="time-slider" style="font-size: 0.9em;">
+      Show commits until:
+      <input type="range" id="time-slider" min="0" max="100" value="100">
+      <time id="selectedTime"></time>
+    </label>
   </div>
   <div id="chart"></div>
 
