@@ -9,33 +9,25 @@
   <script type="module" src="./main.js"></script>
 </head>
 <body>
-
   <section class="summary-panel">
     <h1>Meta</h1>
+    <p>This page includes stats about the code of this website.</p>
+    <div style="display: flex; align-items: baseline; flex: 1;">
+      <label for="time-slider" style="font-size: 0.9em;">
+        Show commits until:
+        <input type="range" id="time-slider" min="0" max="100" value="100">
+        <time id="selectedTime"></time>
+      </label>
+    </div>
     <div class="stat-grid" id="stats"></div>
   </section>
 
-
   <h2 id="chart-title">Commits by time of day</h2>
-  <div style="display: flex; align-items: baseline; flex: 1;">
-    <label for="time-slider" style="font-size: 0.9em;">
-      Show commits until:
-      <input type="range" id="time-slider" min="0" max="100" value="100">
-      <time id="selectedTime"></time>
-    </label>
-  </div>
   <div id="chart"></div>
 
   <p id="selection-count">No commits selected</p>
-  <div id="language-breakdown" class="language-columns">
-    <div class="lang-block">
-      <div class="lang-name"></div>
-      <div class="lang-lines"></div>
-      <div class="lang-percent"></div>
-    </div>
-  </div>
+  <div id="language-breakdown" class="language-columns"></div>
 
-  <!-- ✅ 5. Tooltip -->
   <dl id="commit-tooltip" class="info tooltip" hidden>
     <dt>Commit</dt>
     <dd><a href="" id="commit-link" target="_blank"></a></dd>
@@ -48,6 +40,5 @@
     <dt>Lines edited</dt>
     <dd id="commit-lines"></dd>
   </dl>
-
 </body>
 </html>

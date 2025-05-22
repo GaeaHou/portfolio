@@ -400,28 +400,34 @@ time {
   margin-top: 0.2em;
 }
 
-/* ===== Summary Stats 卡片横向布局 ===== */
+/* ===== Summary Stats 横向布局 ===== */
 .summary-panel {
   padding: 2em 0;
 }
 
-.summary-panel h2 {
-  font-size: 2em;
-  font-weight: bold;
-  margin-bottom: 1.2em;
+.summary-panel h1 {
+  font-size: 3em;
+  border-bottom: none; /* 移除下边框，与图片一致 */
+  margin-bottom: 0.3em;
+}
+
+.summary-panel p {
+  font-size: 1em;
+  color: #666;
+  margin-bottom: 1em;
 }
 
 .stat-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 3em 2em;
+  gap: 3em 2em; /* 图片中卡片间距较大 */
   justify-content: flex-start;
   align-items: flex-start;
-  flex-direction: row; /* 强制横向排列 */
+  flex-direction: row;
 }
 
 .stat-card {
-  flex: 0 0 auto;  /* 不拉伸 */
+  flex: 0 0 auto; /* 不拉伸 */
   text-align: left;
   min-width: 100px;
 }
@@ -432,6 +438,7 @@ time {
   font-weight: 600;
   letter-spacing: 0.05em;
   margin-bottom: 0.25em;
+  text-transform: uppercase; /* 图片中标签是大写 */
 }
 
 .stat-value {
@@ -440,6 +447,26 @@ time {
   color: #111;
 }
 
+/* ===== Summary Stats 暗色模式 ===== */
+html[color-scheme="dark"] .stat-label {
+  color: #c4c4c4;
+}
+
+html[color-scheme="dark"] .stat-value {
+  color: #ffffff;
+}
+
+/* 媒体查询后备，确保自动模式下暗色模式样式生效 */
+@media (prefers-color-scheme: dark) {
+  html:not([color-scheme="light"]) {
+    .stat-label {
+      color: #c4c4c4;
+    }
+    .stat-value {
+      color: #ffffff;
+    }
+  }
+}
 .gridlines line {
   stroke: #ccc;
   stroke-opacity: 0.3;
