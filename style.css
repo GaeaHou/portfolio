@@ -518,6 +518,14 @@ circle {
   transition: 200ms;
   transform-origin: center;
   transform-box: fill-box;
+
+  @starting-style {
+    r: 0;
+  }
+
+  /* 设置 --r 变量并动态调整 r 的过渡时长 */
+  --r: attr(r); /* 将 SVG 的 r 属性绑定到 CSS 变量 --r */
+  transition: all 200ms, r calc(var(--r) * 100ms); /* r 的过渡时长与半径成正比 */
 }
 
 circle:hover {
