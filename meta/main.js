@@ -83,12 +83,18 @@ function updateScatterPlot(data, filteredCommits) {
     width: width - margin.left - margin.right,
     height: height - margin.top - margin.bottom,
   };
-  d3.select('#chart svg').remove();
-  const svg = d3
-    .select('#chart')
-    .append('svg')
-    .attr('viewBox', `0 0 ${width} ${height + 60}`)
-    .style('overflow', 'visible');
+
+  // 确保 SVG 只创建一次
+  let svg = d3.select('#chart svg');
+  if (svg.empty()) {
+    svg = d3
+      .select('#chart')
+      .append('svg')
+      .attr('viewBox', `0 0 ${width} ${height + 60}`)
+      .style('overflow', 'visible');
+  }
+
+  // 更新 x 轴和 y 轴
   const xScale = d3.scaleTime()
     .domain(d3.extent(filteredCommits, d => d.datetime))
     .range([usableArea.left, usableArea.right])
@@ -103,46 +109,32 @@ function updateScatterPlot(data, filteredCommits) {
   const rScale = d3.scaleSqrt()
     .domain([minLines, maxLines])
     .range([3, 20]);
+
+  // 更新坐标轴
+  svg.selectAll('.axis').remove(); // 移除旧坐标轴
   svg.append('g')
+    .attr('class', 'axis')
     .attr('transform', `translate(${usableArea.left}, 0)`)
     .call(d3.axisLeft(yScale).tickFormat('').tickSize(-usableArea.width));
   svg.append('g')
+    .attr('class', 'axis')
     .attr('transform', `translate(${usableArea.left}, 0)`)
     .call(d3.axisLeft(yScale).tickFormat(d => String(d % 24).padStart(2, '0') + ':00'));
   svg.append('g')
+    .attr('class', 'axis')
     .attr('transform', `translate(0, ${usableArea.bottom})`)
     .call(d3.axisBottom(xScale));
-  const sortedCommits = d3.sort(filteredCommits, d => -d.totalLines);
-  const dots = svg.append('g').attr('class', 'dots');
-  dots.selectAll('circle')
-    .data(sortedCommits)
-    .join('circle')
-    .attr('cx', d => xScale(d.datetime))
-    .attr('cy', d => yScale(d.hourFrac))
-    .attr('r', d => rScale(d.totalLines))
-    .attr('fill', d => colorScale(d.hourFrac))
-    .attr('stroke', 'black')
-    .attr('stroke-width', 0.2)
-    .style('fill-opacity', 0.7)
-    .on('mouseenter', (event, commit) => {
-      d3.select(event.currentTarget).style('fill-opacity', 1);
-      renderTooltipContent(commit);
-      updateTooltipVisibility(true);
-      updateTooltipPosition(event);
-    })
-    .on('mousemove', updateTooltipPosition)
-    .on('mouseleave', (event) => {
-      d3.select(event.currentTarget).style('fill-opacity', 0.7);
-      updateTooltipVisibility(false);
-    });
+
+  // 更新图例（保持不变）
   const legendWidth = 300;
   const legendHeight = 12;
+  svg.selectAll('.legend').remove(); // 移除旧图例
   const legendGroup = svg.append("g")
     .attr("class", "legend")
     .attr("transform", `translate(${(width - legendWidth) / 2}, ${height + 40})`);
   const legendScale = d3.scaleLinear().domain([0, 24]).range([0, legendWidth]);
   const gradientId = "legend-gradient";
-  const defs = svg.append("defs");
+  const defs = svg.selectAll('defs').data([0]).join('defs');
   const linearGradient = defs.append("linearGradient")
     .attr("id", gradientId)
     .attr("x1", "0%").attr("x2", "100%")
@@ -173,6 +165,57 @@ function updateScatterPlot(data, filteredCommits) {
     .call(legendAxis)
     .selectAll("text")
     .style("font-size", "0.75em");
+
+  // 更新散点，使用 join 方法避免重复移除和重绘
+  const sortedCommits = d3.sort(filteredCommits, d => -d.totalLines);
+  let dots = svg.selectAll('.dots').data([0]).join('g').attr('class', 'dots');
+
+  // 使用 join 方法绑定数据
+  const circles = dots.selectAll('circle')
+    .data(sortedCommits, d => d.id); // 使用 commit id 作为唯一标识
+
+  // 移除的点（exit）
+  circles.exit()
+    .transition()
+    .duration(300)
+    .style('opacity', 0)
+    .attr('r', 0)
+    .remove();
+
+  // 新增的点（enter）
+  const circlesEnter = circles.enter()
+    .append('circle')
+    .attr('cx', d => xScale(d.datetime))
+    .attr('cy', d => yScale(d.hourFrac))
+    .attr('r', 0) // 初始半径为 0
+    .style('opacity', 0) // 初始透明度为 0
+    .attr('fill', d => colorScale(d.hourFrac))
+    .attr('stroke', 'black')
+    .attr('stroke-width', 0.2)
+    .style('fill-opacity', 0.7)
+    .on('mouseenter', (event, commit) => {
+      d3.select(event.currentTarget).style('fill-opacity', 1);
+      renderTooltipContent(commit);
+      updateTooltipVisibility(true);
+      updateTooltipPosition(event);
+    })
+    .on('mousemove', updateTooltipPosition)
+    .on('mouseleave', (event) => {
+      d3.select(event.currentTarget).style('fill-opacity', 0.7);
+      updateTooltipVisibility(false);
+    });
+
+  // 更新现有点和新点（enter + update）
+  circlesEnter.merge(circles)
+    .transition()
+    .duration(300)
+    .attr('cx', d => xScale(d.datetime))
+    .attr('cy', d => yScale(d.hourFrac))
+    .attr('r', d => rScale(d.totalLines))
+    .style('opacity', 1)
+    .attr('fill', d => colorScale(d.hourFrac));
+
+  // 更新刷选功能
   function isCommitSelected(selection, commit) {
     if (!selection) return false;
     const [[x0, y0], [x1, y1]] = selection;
@@ -180,6 +223,7 @@ function updateScatterPlot(data, filteredCommits) {
     const y = yScale(commit.hourFrac);
     return x0 <= x && x <= x1 && y0 <= y && y <= y1;
   }
+
   function renderSelectionCount(selection) {
     const selectedCommits = selection
       ? filteredCommits.filter((d) => isCommitSelected(selection, d))
@@ -188,6 +232,7 @@ function updateScatterPlot(data, filteredCommits) {
     countElement.textContent = `${selectedCommits.length || 'No'} commits selected`;
     return selectedCommits;
   }
+
   function renderLanguageBreakdown(selection) {
     const selectedCommits = selection
       ? filteredCommits.filter((d) => isCommitSelected(selection, d))
@@ -210,16 +255,19 @@ function updateScatterPlot(data, filteredCommits) {
       container.appendChild(langDiv);
     }
   }
+
   function brushed(event) {
     const selection = event.selection;
     d3.selectAll("circle").classed("selected", d => isCommitSelected(selection, d));
     renderSelectionCount(selection);
     renderLanguageBreakdown(selection);
   }
+
   const brush = d3.brush()
     .extent([[usableArea.left, usableArea.top], [usableArea.right, usableArea.bottom]])
     .on("start brush end", brushed);
   svg.call(brush);
+
   svg.selectAll('.dots, .overlay ~ *').raise();
 }
 
@@ -251,20 +299,33 @@ async function main() {
     .range([0, 100]);
   let commitMaxTime = timeScale.invert(commitProgress);
   let filteredCommits = commits;
+
   function filterCommitsByTime() {
     filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
   }
-  function updateTimeDisplay() {
+
+  // 防抖函数
+  function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
+
+  // 更新时间显示和散点图
+  const debouncedUpdate = debounce(() => {
     commitProgress = Number(d3.select('#time-slider').property('value'));
     commitMaxTime = timeScale.invert(commitProgress);
     d3.select('#selectedTime').text(commitMaxTime.toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' }));
     filterCommitsByTime();
-    renderCommitInfo(data, filteredCommits); // 更新统计信息
+    renderCommitInfo(data, filteredCommits);
     updateScatterPlot(data, filteredCommits);
-  }
+  }, 100); // 100ms 防抖
+
   renderCommitInfo(data, filteredCommits);
   updateScatterPlot(data, filteredCommits);
-  d3.select('#time-slider').on('input', updateTimeDisplay);
+  d3.select('#time-slider').on('input', debouncedUpdate);
 }
 
 main();
