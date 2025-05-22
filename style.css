@@ -515,16 +515,13 @@ dl.info dd {
 }
 
 circle {
-  transition: 400ms;
+  transition: all 300ms ease-in-out, opacity 300ms ease-in-out;
   transform-origin: center;
   transform-box: fill-box;
-
   @starting-style {
     r: 0;
+    opacity: 0;
   }
-
-  /* 设置 --r 变量并动态调整 r 的过渡时长 */
-  --r: attr(r); /* 将 SVG 的 r 属性绑定到 CSS 变量 --r */
 }
 
 circle:hover {
