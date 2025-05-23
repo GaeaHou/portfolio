@@ -6,6 +6,24 @@ let timeScale;
 let filteredCommits = [];
 let prevFilteredCommits = []; // 记录上一次的 filteredCommits
 
+let NUM_ITEMS = 100; // Ideally, let this value be the length of your commit history
+let ITEM_HEIGHT = 30; // Feel free to change
+let VISIBLE_COUNT = 10; // Feel free to change as well
+let totalHeight = (NUM_ITEMS - 1) * ITEM_HEIGHT;
+const scrollContainer = d3.select('#scroll-container');
+const spacer = d3.select('#spacer');
+spacer.style('height', `${totalHeight}px`);
+const itemsContainer = d3.select('#items-container');
+scrollContainer.on('scroll', () => {
+  const scrollTop = scrollContainer.property('scrollTop');
+  let startIndex = Math.floor(scrollTop / ITEM_HEIGHT);
+  startIndex = Math.max(
+    0,
+    Math.min(startIndex, commits.length - VISIBLE_COUNT),
+  );
+  renderItems(startIndex);
+});
+
 async function loadData() {
   const data = await d3.csv('loc.csv', (row) => ({
     ...row,
@@ -46,6 +64,28 @@ function processCommits(data) {
 
       return ret;
     });
+}
+function renderItems(startIndex) {
+  // 1. 清除之前渲染
+  itemsContainer.selectAll('div').remove();
+
+  // 2. 新切片
+  const endIndex = Math.min(startIndex + VISIBLE_COUNT, commits.length);
+  let newCommitSlice = commits.slice(startIndex, endIndex);
+
+  // 3. 更新 scatterplot 只需调用 updateScatterPlot
+  // 用这个切片的数据替代全量数据渲染
+  updateScatterPlot(data, newCommitSlice);
+
+  // 4. 绑定并渲染每个 commit
+  itemsContainer.selectAll('div')
+    .data(newCommitSlice)
+    .enter()
+    .append('div')
+    .attr('class', 'item')
+    .html(d => `<strong>${d.id}</strong> &ndash; ${d.author} <small>${d.datetime.toLocaleString()}</small>`)
+    .style('position', 'absolute')
+    .style('top', (_, idx) => `${idx * ITEM_HEIGHT}px`);
 }
 
 function renderCommitInfo(data, commits) {
