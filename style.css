@@ -487,13 +487,19 @@ dl.info dd {
   pointer-events: none;
 }
 
+/* 现有点的样式，不应用过渡 */
 circle {
-  transition: r 0.5s ease, cx 0.5s ease, cy 0.5s ease, fill-opacity 0.5s ease;
+  transition: none; /* 移除所有点的默认过渡 */
+}
+
+/* 新加入点的样式，应用半径过渡 */
+circle.new-circle {
+  transition: r 0.5s ease; /* 仅新点有半径过渡 */
 }
 
 @starting-style {
-  circle {
-    r: 0;
+  circle.new-circle {
+    r: 0; /* 新点从半径 0 开始 */
   }
 }
 

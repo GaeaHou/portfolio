@@ -89,8 +89,8 @@ function renderCommitInfo(data, commits) {
   
 
 
-function updateScatterPlot(data, filteredCommits) {
-    d3.select('svg').remove(); // 先清空原 svg
+  function updateScatterPlot(data, filteredCommits) {
+    d3.select('svg').remove(); // 清空原 SVG
     const width = 1000;
     const height = 600;
     const margin = { top: 10, right: 10, bottom: 40, left: 50 };
@@ -109,46 +109,60 @@ function updateScatterPlot(data, filteredCommits) {
       .attr('viewBox', `0 0 ${width} ${height + 60}`)
       .style('overflow', 'visible');
   
-    const xScale = d3.scaleTime()
+    const xScale = d3
+      .scaleTime()
       .domain(d3.extent(filteredCommits, d => d.datetime))
       .range([usableArea.left, usableArea.right])
       .nice();
   
-    const yScale = d3.scaleLinear()
+    const yScale = d3
+      .scaleLinear()
       .domain([0, 24])
       .range([usableArea.bottom, usableArea.top]);
   
-    const colorScale = d3.scaleSequential()
+    const colorScale = d3
+      .scaleSequential()
       .domain([0, 24])
       .interpolator(d3.interpolateWarm);
   
     const [minLines, maxLines] = d3.extent(filteredCommits, d => d.totalLines);
-    const rScale = d3.scaleSqrt()
+    const rScale = d3
+      .scaleSqrt()
       .domain([minLines, maxLines])
       .range([3, 20]);
   
-    svg.append('g')
+    svg
+      .append('g')
       .attr('transform', `translate(${usableArea.left}, 0)`)
       .call(d3.axisLeft(yScale).tickFormat('').tickSize(-usableArea.width));
   
-    svg.append('g')
+    svg
+      .append('g')
       .attr('transform', `translate(${usableArea.left}, 0)`)
       .call(d3.axisLeft(yScale).tickFormat(d => String(d % 24).padStart(2, '0') + ':00'));
   
-    svg.append('g')
+    svg
+      .append('g')
       .attr('transform', `translate(0, ${usableArea.bottom})`)
       .call(d3.axisBottom(xScale));
   
     const sortedCommits = d3.sort(filteredCommits, d => -d.totalLines);
   
     const dots = svg.append('g').attr('class', 'dots');
-    dots.selectAll('circle')
+  
+    // 判断滑块方向
+    const isMovingForward = commitProgress > lastCommitProgress;
+  
+    dots
+      .selectAll('circle')
       .data(sortedCommits, d => d.id)
       .join(
-        enter => enter.append('circle')
+        enter => enter
+          .append('circle')
+          .attr('class', isMovingForward ? 'new-circle' : '') // 仅向前移动时添加 new-circle 类
           .attr('cx', d => xScale(d.datetime))
           .attr('cy', d => yScale(d.hourFrac))
-          .attr('r', d => rScale(d.totalLines)) // 目标半径
+          .attr('r', d => rScale(d.totalLines))
           .attr('fill', d => colorScale(d.hourFrac))
           .attr('stroke', 'black')
           .attr('stroke-width', 0.2)
@@ -166,6 +180,7 @@ function updateScatterPlot(data, filteredCommits) {
             updateTooltipVisibility(false);
           }),
         update => update
+          .attr('class', '') // 移除 new-circle 类，确保现有点无过渡
           .attr('cx', d => xScale(d.datetime))
           .attr('cy', d => yScale(d.hourFrac))
           .attr('r', d => rScale(d.totalLines))
@@ -174,7 +189,7 @@ function updateScatterPlot(data, filteredCommits) {
           .attr('stroke-width', 0.2)
           .style('fill-opacity', 0.7)
           .attr('style', d => `--r: ${rScale(d.totalLines)}`),
-        exit => exit.remove()
+        exit => exit.remove() // 退出点直接移除，无过渡
       );
   
     // ✅ 添加图例（颜色条）
@@ -353,40 +368,40 @@ function renderLanguageBreakdown(selection) {
     }
   }
 
-async function main() {
-    
+  async function main() {
     const data = await loadData();
     const commits = processCommits(data);
-
+  
     timeScale = d3.scaleTime(
-      [d3.min(commits, (d) => d.datetime), d3.max(commits, (d) => d.datetime)],
+      [d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)],
       [0, 100]
     );
-
+  
     let commitMaxTime = timeScale.invert(commitProgress);
     filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
     renderCommitInfo(data, filteredCommits);
     updateScatterPlot(data, filteredCommits);
-
+  
     const slider = document.getElementById('time-slider');
     const selectedTime = document.getElementById('selectedTime');
     selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
-      dateStyle: "long",
-      timeStyle: "short"
+      dateStyle: 'long',
+      timeStyle: 'short',
     });
+  
     slider.addEventListener('input', (e) => {
-    commitProgress = +e.target.value;
-    selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
-      dateStyle: "long",
-      timeStyle: "short"
+      const newProgress = +e.target.value;
+      commitProgress = newProgress;
+      selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
+        dateStyle: 'long',
+        timeStyle: 'short',
+      });
+  
+      commitMaxTime = timeScale.invert(commitProgress);
+      filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
+      updateScatterPlot(data, filteredCommits);
+      lastCommitProgress = newProgress; // 更新 lastCommitProgress
     });
-
-    commitMaxTime = timeScale.invert(commitProgress);
-    filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
-    updateScatterPlot(data, filteredCommits);
-  });
-
-
   }
   
 main();
