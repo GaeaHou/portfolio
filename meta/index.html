@@ -13,6 +13,13 @@
     <h1>Meta</h1>
     <p>This page includes stats about the code of this website.</p>
     <div class="stat-grid" id="stats"></div>
+    <div class="slider-container">
+      <label for="time-slider" class="slider-label">
+        Show commits until:
+        <input type="range" id="time-slider" min="0" max="100" value="100">
+        <time id="selectedTime"></time>
+      </label>
+    </div>
     <dl class="files">
       <!-- 每个文件的一个 <div> 由 D3 动态生成 -->
     </dl>
