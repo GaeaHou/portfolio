@@ -365,6 +365,11 @@ time {
   font-size: 0.9em;
 }
 
+#time-slider {
+  width: 940px; /* 匹配 usableArea.width (1000 - 50 - 10) */
+  margin-left: 50px; /* 匹配 margin.left */
+}
+
 .github-stats-card {
   max-width: 800px;
   margin: 2em auto;
