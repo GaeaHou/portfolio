@@ -6,7 +6,8 @@ let timeScale;
 let filteredCommits = [];
 let prevFilteredCommits = []; // 记录上一次的 filteredCommits
 
-
+let commits;
+let data;
 // Step 3.1: Add global variables for scrollytelling
 let NUM_ITEMS = 100; // Ideally, let this value be the length of your commit history
 let ITEM_HEIGHT = 30; // Feel free to change
@@ -382,8 +383,8 @@ function renderItems(startIndex) {
 }
 
 async function main() {
-  const data = await loadData();
-  const commits = processCommits(data);
+  data = await loadData();
+  commits = processCommits(data);
 
   timeScale = d3.scaleTime(
     [d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)],
