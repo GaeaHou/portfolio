@@ -387,6 +387,11 @@ async function main() {
   data = await loadData();
   commits = processCommits(data);
 
+  // Step 3.1: Update NUM_ITEMS based on commits length
+  NUM_ITEMS = commits.length;
+  totalHeight = (NUM_ITEMS - 1) * ITEM_HEIGHT;
+  spacer.style('height', `${totalHeight}px`);
+
   timeScale = d3.scaleTime(
     [d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)],
     [0, 100]
@@ -467,32 +472,32 @@ async function main() {
     d3.select('.files').selectAll('.line')
       .style('background', d => fileTypeColors(d.type));
   });
-}
 
-// Step 3.2: Generate commit text (added at the bottom)
-d3.select('#scatter-story')
-  .selectAll('.step')
-  .data(commits)
-  .join('div')
-  .attr('class', 'step')
-  .html(
-    (d, i) => `
-      On ${d.datetime.toLocaleString('en', {
-        dateStyle: 'full',
-        timeStyle: 'short',
-      })},
-      I made <a href="${d.url}" target="_blank">${
-        i > 0 ? 'another glorious commit' : 'my first commit, and it was glorious'
-      }</a>.
-      I edited ${d.totalLines} lines across ${
-        d3.rollups(
-          d.lines,
-          (D) => D.length,
-          (d) => d.file,
-        ).length
-      } files.
-      Then I looked over all I had made, and I saw that it was very good.
-    `,
-  );
+  // Step 3.2: Generate commit text for #scatter-story
+  d3.select('#scatter-story')
+    .selectAll('.step')
+    .data(commits)
+    .join('div')
+    .attr('class', 'step')
+    .html(
+      (d, i) => `
+        On ${d.datetime.toLocaleString('en', {
+          dateStyle: 'full',
+          timeStyle: 'short',
+        })},
+        I made <a href="${d.url}" target="_blank">${
+          i > 0 ? 'another glorious commit' : 'my first commit, and it was glorious'
+        }</a>.
+        I edited ${d.totalLines} lines across ${
+          d3.rollups(
+            d.lines,
+            (D) => D.length,
+            (d) => d.file,
+          ).length
+        } files.
+        Then I looked over all I had made, and I saw that it was very good.
+      `,
+    );
+}
 
 main();
