@@ -817,6 +817,7 @@ dd {
   gap: 0.15em;
   padding-top: 0.6em;
   margin-left: 0;
+  justify-content: flex-end;
 }
 
 /* Step 2.2：单元可视化的点样式 */
