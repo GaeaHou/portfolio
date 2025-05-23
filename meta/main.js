@@ -152,6 +152,7 @@ function updateScatterPlot(data, filteredCommits) {
       .attr('stroke', 'black')
       .attr('stroke-width', 0.2)
       .style('fill-opacity', 0.7)
+      .attr('style', d => `--r: ${rScale(d.totalLines)}`)
       .on('mouseenter', (event, commit) => {
         d3.select(event.currentTarget).style('fill-opacity', 1);
         renderTooltipContent(commit);

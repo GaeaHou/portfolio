@@ -488,9 +488,13 @@ dl.info dd {
 }
 
 circle {
-  transition: 200ms;
-  transform-origin: center;
-  transform-box: fill-box;
+  transition: all 200ms, r calc(var(--r) * 100ms);
+}
+
+@starting-style {
+  circle {
+    r: 0;
+  }
 }
 
 circle:hover {
@@ -778,4 +782,12 @@ html[color-scheme="dark"] h2 {
 html[color-scheme="dark"] .color-scheme {
   background-color: rgba(30, 30, 30, 0.85) !important;
   color: white;
+}
+
+input[type="range"] {
+  width: 95vw;
+  max-width: 1000px;
+  margin-left: 1em;
+  margin-right: 1em;
+  /* 你可以根据实际情况再微调 */
 }
