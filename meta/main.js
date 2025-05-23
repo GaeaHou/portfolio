@@ -7,7 +7,7 @@ let filteredCommits = [];
 let prevFilteredCommits = []; // 记录上一次的 filteredCommits
 
 let NUM_ITEMS = 100; // Ideally, let this value be the length of your commit history
-let ITEM_HEIGHT = 30; // Feel free to change
+let ITEM_HEIGHT = 100; // Feel free to change
 let VISIBLE_COUNT = 10; // Feel free to change as well
 let totalHeight = (NUM_ITEMS - 1) * ITEM_HEIGHT;
 const scrollContainer = d3.select('#scroll-container');
@@ -66,24 +66,29 @@ function processCommits(data) {
     });
 }
 function renderItems(startIndex) {
-  // 1. 清除之前渲染
+  // Clear things off
   itemsContainer.selectAll('div').remove();
-
-  // 2. 新切片
   const endIndex = Math.min(startIndex + VISIBLE_COUNT, commits.length);
   let newCommitSlice = commits.slice(startIndex, endIndex);
-
-  // 3. 更新 scatterplot 只需调用 updateScatterPlot
-  // 用这个切片的数据替代全量数据渲染
+  // 更新散点图
   updateScatterPlot(data, newCommitSlice);
+  // Re-bind the commit data to the container and represent each using a div
+  filteredCommits = newCommitSlice;
+  displayCommitFiles();
 
-  // 4. 绑定并渲染每个 commit
   itemsContainer.selectAll('div')
     .data(newCommitSlice)
     .enter()
     .append('div')
     .attr('class', 'item')
-    .html(d => `<strong>${d.id}</strong> &ndash; ${d.author} <small>${d.datetime.toLocaleString()}</small>`)
+    .html((d, i) => `
+      <p>
+        On ${d.datetime.toLocaleString("en", {dateStyle: "full", timeStyle: "short"})}, I made
+        <a href="${d.url}" target="_blank">
+          ${i > 0 ? 'another glorious commit' : 'my first commit, and it was glorious'}
+        </a>. I edited ${d.totalLines} lines across ${d3.rollups(d.lines, D => D.length, d => d.file).length} files. Then I looked over all I had made, and I saw that it was very good.
+      </p>
+    `)
     .style('position', 'absolute')
     .style('top', (_, idx) => `${idx * ITEM_HEIGHT}px`);
 }
@@ -387,6 +392,37 @@ function updateTooltipPosition(event) {
   tooltip.style.top = `${event.clientY + 10}px`;
 }
 
+function displayCommitFiles() {
+  const lines = filteredCommits.flatMap((d) => d.lines);
+  let fileTypeColors = d3.scaleOrdinal(d3.schemeTableau10);
+  let files = d3
+    .groups(lines, (d) => d.file)
+    .map(([name, lines]) => {
+      return { name, lines };
+    });
+  files = d3.sort(files, (d) => -d.lines.length);
+  d3.select('.files').selectAll('div').remove();
+  let filesContainer = d3
+    .select('.files')
+    .selectAll('div')
+    .data(files)
+    .enter()
+    .append('div');
+  filesContainer
+    .append('dt')
+    .html(
+      (d) => `<code>${d.name}</code><small>${d.lines.length} lines</small>`,
+    );
+  filesContainer
+    .append('dd')
+    .selectAll('div')
+    .data((d) => d.lines)
+    .enter()
+    .append('div')
+    .attr('class', 'line')
+    .style('background', (d) => fileTypeColors(d.type));
+}
+
 async function main() {
   const data = await loadData();
   const commits = processCommits(data);
@@ -401,65 +437,8 @@ async function main() {
   renderCommitInfo(data, filteredCommits);
   updateScatterPlot(data, filteredCommits);
   prevFilteredCommits = [...filteredCommits]; // 初始化 prevFilteredCommits
-
-  const slider = document.getElementById('time-slider');
-  const selectedTime = document.getElementById('selectedTime');
-  selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
-    dateStyle: 'long',
-    timeStyle: 'short',
-  });
-
-  slider.addEventListener('input', (e) => {
-    const newProgress = +e.target.value;
-    commitProgress = newProgress;
-    selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
-      dateStyle: 'long',
-      timeStyle: 'short',
-    });
-
-    commitMaxTime = timeScale.invert(commitProgress);
-    filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
-    renderCommitInfo(data, filteredCommits);
-    updateScatterPlot(data, filteredCommits);
-    lastCommitProgress = newProgress;
-    prevFilteredCommits = [...filteredCommits];
-
-    // Step 2.1：添加文件单元可视化
-    let lines = filteredCommits.flatMap((d) => d.lines);
-    let files = [];
-    files = d3
-      .groups(lines, (d) => d.file)
-      .map(([name, lines]) => {
-        return { name, lines };
-      });
-
-    // Step 2.3：按行数降序排序
-    files = d3.sort(files, (d) => -d.lines.length);
-
-    // 清除现有文件可视化内容
-    d3.select('.files').selectAll('div').remove();
-
-    // 创建文件可视化
-    let filesContainer = d3.select('.files').selectAll('div').data(files).enter().append('div');
-
-    // Step 2.1 & 2.2：在 <dt> 中显示文件名和行数
-    filesContainer.append('dt')
-      .append('code')
-      .html(d => `${d.name} <small style="display: block; font-size: 0.75em; opacity: 0.7;">${d.lines.length} lines</small>`);
-
-    // Step 2.2：为每行添加一个 <div class="line">
-    filesContainer.append('dd')
-      .selectAll('div')
-      .data(d => d.lines)
-      .enter()
-      .append('div')
-      .attr('class', 'line');
-
-    // Step 2.4：按技术类型给点上色
-    let fileTypeColors = d3.scaleOrdinal(d3.schemeTableau10);
-    d3.select('.files').selectAll('.line')
-      .style('background', d => fileTypeColors(d.type));
-  });
+  displayCommitFiles(); // 保留文件显示
+  renderItems(0); // 显式调用 renderItems 确保初始渲染
 }
 
 main();

@@ -857,7 +857,7 @@ dd {
   top: 0;
   left: 0;
   width: 100%;
-  background: none;
+  background: none; /* transparent */
   pointer-events: none;
 }
 
@@ -869,8 +869,16 @@ dd {
 }
 
 .item {
-  height: 30px;
+  height: 100px; /* 调整为 100px */
   padding: 10px;
   box-sizing: border-box;
   border-bottom: 2px solid #eee;
+}
+
+#scroll-date {
+  position: sticky;
+  top: 0;
+  margin-left: 10px;
+  font-size: 0.9em;
+  color: #333;
 }
