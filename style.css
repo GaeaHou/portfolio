@@ -489,16 +489,16 @@ dl.info dd {
 
 /* 现有点的样式，不应用过渡 */
 circle {
-  transition: none; 
-  
+  transition: cx 0.5s ease, cy 0.5s ease; /* 添加位置过渡 */
 }
+
 circle.new-circle {
-  transition: r 0.5s ease;
+  transition: r 0.5s ease; /* 保持新点半径过渡 */
 }
 
 @starting-style {
   circle.new-circle {
-    r: 0;
+    r: 0; /* 新点从半径 0 开始 */
   }
 }
 
