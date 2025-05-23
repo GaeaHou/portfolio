@@ -6,13 +6,12 @@ let timeScale;
 let filteredCommits = [];
 let prevFilteredCommits = []; // 记录上一次的 filteredCommits
 
-let commits; // 全局变量
-let data;   // 全局变量
-
+let commits;
+let data;
 // Step 3.1: Add global variables for scrollytelling
-let NUM_ITEMS = 100; // 初始值，稍后更新为 commits.length
-let ITEM_HEIGHT = 100; // 增加到 100px 以容纳叙述内容
-let VISIBLE_COUNT = 10;
+let NUM_ITEMS = 100; // Ideally, let this value be the length of your commit history
+let ITEM_HEIGHT = 30; // Feel free to change
+let VISIBLE_COUNT = 10; // Feel free to change as well
 let totalHeight = (NUM_ITEMS - 1) * ITEM_HEIGHT;
 const scrollContainer = d3.select('#scroll-container');
 const spacer = d3.select('#spacer');
@@ -20,7 +19,7 @@ spacer.style('height', `${totalHeight}px`);
 const itemsContainer = d3.select('#items-container');
 
 async function loadData() {
-  data = await d3.csv('loc.csv', (row) => ({
+  const data = await d3.csv('loc.csv', (row) => ({
     ...row,
     line: Number(row.line),
     depth: Number(row.depth),
@@ -112,6 +111,7 @@ function updateScatterPlot(data, filteredCommits) {
     height: height - margin.top - margin.bottom,
   };
 
+  // 获取或创建 SVG（不移除）
   let svg = d3.select('#chart').select('svg');
   if (svg.empty()) {
     svg = d3
@@ -120,6 +120,7 @@ function updateScatterPlot(data, filteredCommits) {
       .attr('viewBox', `0 0 ${width} ${height + 60}`)
       .style('overflow', 'visible');
 
+    // 初始化轴和图例
     const xScale = d3.scaleTime()
       .domain(d3.extent(filteredCommits, d => d.datetime))
       .range([usableArea.left, usableArea.right])
@@ -144,6 +145,7 @@ function updateScatterPlot(data, filteredCommits) {
       .attr('transform', `translate(0, ${usableArea.bottom})`)
       .call(d3.axisBottom(xScale));
 
+    // 图例
     const legendWidth = 300;
     const legendHeight = 12;
 
@@ -195,6 +197,7 @@ function updateScatterPlot(data, filteredCommits) {
       .style("font-size", "0.75em");
   }
 
+  // 更新比例尺
   const xScale = d3.scaleTime()
     .domain(d3.extent(filteredCommits, d => d.datetime))
     .range([usableArea.left, usableArea.right])
@@ -213,6 +216,7 @@ function updateScatterPlot(data, filteredCommits) {
     .domain([minLines, maxLines])
     .range([3, 20]);
 
+  // 更新轴
   svg.select('.y-axis-grid')
     .call(d3.axisLeft(yScale).tickFormat('').tickSize(-usableArea.width));
 
@@ -222,11 +226,14 @@ function updateScatterPlot(data, filteredCommits) {
   svg.select('.x-axis')
     .call(d3.axisBottom(xScale));
 
+  // 确定新点
   const prevCommitIds = new Set(prevFilteredCommits.map(d => d.id));
   const newCommits = filteredCommits.filter(d => !prevCommitIds.has(d.id));
 
+  // 判断滑块方向
   const isMovingForward = commitProgress > lastCommitProgress;
 
+  // 更新点
   const dots = svg.selectAll('.dots').data([null]);
   const dotsEnter = dots.enter().append('g').attr('class', 'dots');
   const dotsGroup = dotsEnter.merge(dots);
@@ -238,7 +245,7 @@ function updateScatterPlot(data, filteredCommits) {
         .attr('class', d => (isMovingForward && newCommits.some(nc => nc.id === d.id)) ? 'new-circle' : '')
         .attr('cx', d => xScale(d.datetime))
         .attr('cy', d => yScale(d.hourFrac))
-        .attr('r', 0)
+        .attr('r', 0) // 新点从 r: 0 开始，过渡到目标值
         .attr('fill', d => colorScale(d.hourFrac))
         .attr('stroke', 'black')
         .attr('stroke-width', 0.2)
@@ -255,12 +262,12 @@ function updateScatterPlot(data, filteredCommits) {
           d3.select(event.currentTarget).style('fill-opacity', 0.7);
           updateTooltipVisibility(false);
         })
-        .transition()
-        .duration(500)
+        .transition() // 添加过渡
+        .duration(500) // 0.5 秒过渡
         .attr('r', d => rScale(d.totalLines)),
       update => update
-        .transition()
-        .duration(500)
+        .transition() // 为现有点添加位置过渡
+        .duration(500) // 0.5 秒过渡
         .attr('class', '')
         .attr('cx', d => xScale(d.datetime))
         .attr('cy', d => yScale(d.hourFrac))
@@ -273,6 +280,7 @@ function updateScatterPlot(data, filteredCommits) {
       exit => exit.remove()
     );
 
+  // 更新 Brushing
   const brush = d3.brush()
     .extent([[usableArea.left, usableArea.top], [usableArea.right, usableArea.bottom]])
     .on("start brush end", brushed);
@@ -351,49 +359,59 @@ function updateTooltipPosition(event) {
   tooltip.style.top = `${event.clientY + 10}px`;
 }
 
-// Step 3.2: Implement renderItems with dummy narrative
+// Step 3.1: Implement renderItems function
 function renderItems(startIndex) {
-  // Clear existing items
+  // Clear things off
   itemsContainer.selectAll('div').remove();
   const endIndex = Math.min(startIndex + VISIBLE_COUNT, commits.length);
   let newCommitSlice = commits.slice(startIndex, endIndex);
 
-  // Check if newCommitSlice is valid
-  if (!newCommitSlice || newCommitSlice.length === 0) return;
-
-  // Update the scatterplot
+  // TODO: Update the scatterplot
   updateScatterPlot(data, newCommitSlice);
 
-  // Bind data and append narrative
+  // Re-bind the commit data to the container and represent each using a div
   itemsContainer.selectAll('div')
     .data(newCommitSlice)
     .enter()
     .append('div')
     .attr('class', 'item')
+    .html(d => `
+      <a href="${d.url}" target="_blank">${d.id}</a>
+      <span> by ${d.author} on ${d.datetime.toLocaleDateString()}</span>
+    `)
     .style('position', 'absolute')
-    .style('top', (d, idx) => `${(startIndex + idx) * ITEM_HEIGHT}px`) // 使用 startIndex + idx 计算 top
-    .html(d => {
-      const index = startIndex + d3.select(this.parentNode).selectAll('div').nodes().indexOf(this);
-      const fileCount = d3.rollups(d.lines, v => v.length, d => d.file).length;
-      return `
-        <p>
-          On ${d.datetime.toLocaleString("en", { dateStyle: "full", timeStyle: "short" })}, I made
-          <a href="${d.url}" target="_blank">
-            ${index > 0 ? 'another glorious commit' : 'my first commit, and it was glorious'}
-          </a>. I edited ${d.totalLines} lines across ${fileCount} files. Then I looked over all I had made, and I saw that it was very good.
-        </p>
-      `;
-    });
+    .style('top', (_, idx) => `${idx * ITEM_HEIGHT}px`);
 }
+
+// Step 3.2: Generate commit text
+d3.select('#scatter-story')
+  .selectAll('.step')
+  .data(commits)
+  .join('div')
+  .attr('class', 'step')
+  .html(
+    (d, i) => `
+		On ${d.datetime.toLocaleString('en', {
+      dateStyle: 'full',
+      timeStyle: 'short',
+    })},
+		I made <a href="${d.url}" target="_blank">${
+      i > 0 ? 'another glorious commit' : 'my first commit, and it was glorious'
+    }</a>.
+		I edited ${d.totalLines} lines across ${
+      d3.rollups(
+        d.lines,
+        (D) => D.length,
+        (d) => d.file,
+      ).length
+    } files.
+		Then I looked over all I had made, and I saw that it was very good.
+	`,
+  );
 
 async function main() {
   data = await loadData();
   commits = processCommits(data);
-
-  // Update NUM_ITEMS based on actual commit length
-  NUM_ITEMS = commits.length;
-  totalHeight = (NUM_ITEMS - 1) * ITEM_HEIGHT;
-  spacer.style('height', `${totalHeight}px`);
 
   timeScale = d3.scaleTime(
     [d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)],
@@ -404,13 +422,16 @@ async function main() {
   filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
   renderCommitInfo(data, filteredCommits);
   updateScatterPlot(data, filteredCommits);
-  prevFilteredCommits = [...filteredCommits];
+  prevFilteredCommits = [...filteredCommits]; // 初始化 prevFilteredCommits
 
-  // Add scroll event listener after data is ready
+  // Step 3.1: Add scroll event listener
   scrollContainer.on('scroll', () => {
     const scrollTop = scrollContainer.property('scrollTop');
     let startIndex = Math.floor(scrollTop / ITEM_HEIGHT);
-    startIndex = Math.max(0, Math.min(startIndex, commits.length - VISIBLE_COUNT));
+    startIndex = Math.max(
+      0,
+      Math.min(startIndex, commits.length - VISIBLE_COUNT),
+    );
     renderItems(startIndex);
   });
 
