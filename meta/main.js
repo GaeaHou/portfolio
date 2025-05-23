@@ -6,24 +6,6 @@ let timeScale;
 let filteredCommits = [];
 let prevFilteredCommits = []; // 记录上一次的 filteredCommits
 
-let NUM_ITEMS = 100; // Ideally, let this value be the length of your commit history
-let ITEM_HEIGHT = 30; // Feel free to change
-let VISIBLE_COUNT = 10; // Feel free to change as well
-let totalHeight = (NUM_ITEMS - 1) * ITEM_HEIGHT;
-const scrollContainer = d3.select('#scroll-container');
-const spacer = d3.select('#spacer');
-spacer.style('height', `${totalHeight}px`);
-const itemsContainer = d3.select('#items-container');
-scrollContainer.on('scroll', () => {
-  const scrollTop = scrollContainer.property('scrollTop');
-  let startIndex = Math.floor(scrollTop / ITEM_HEIGHT);
-  startIndex = Math.max(
-    0,
-    Math.min(startIndex, commits.length - VISIBLE_COUNT),
-  );
-  renderItems(startIndex);
-});
-
 async function loadData() {
   const data = await d3.csv('loc.csv', (row) => ({
     ...row,
@@ -64,28 +46,6 @@ function processCommits(data) {
 
       return ret;
     });
-}
-function renderItems(startIndex) {
-  // 1. 清除之前渲染
-  itemsContainer.selectAll('div').remove();
-
-  // 2. 新切片
-  const endIndex = Math.min(startIndex + VISIBLE_COUNT, commits.length);
-  let newCommitSlice = commits.slice(startIndex, endIndex);
-
-  // 3. 更新 scatterplot 只需调用 updateScatterPlot
-  // 用这个切片的数据替代全量数据渲染
-  updateScatterPlot(data, newCommitSlice);
-
-  // 4. 绑定并渲染每个 commit
-  itemsContainer.selectAll('div')
-    .data(newCommitSlice)
-    .enter()
-    .append('div')
-    .attr('class', 'item')
-    .html(d => `<strong>${d.id}</strong> &ndash; ${d.author} <small>${d.datetime.toLocaleString()}</small>`)
-    .style('position', 'absolute')
-    .style('top', (_, idx) => `${idx * ITEM_HEIGHT}px`);
 }
 
 function renderCommitInfo(data, commits) {
@@ -273,7 +233,7 @@ function updateScatterPlot(data, filteredCommits) {
         .attr('class', d => (isMovingForward && newCommits.some(nc => nc.id === d.id)) ? 'new-circle' : '')
         .attr('cx', d => xScale(d.datetime))
         .attr('cy', d => yScale(d.hourFrac))
-        .attr('r', 0) // 新点从 r: 0 开始，过渡到目标值
+        .attr('r', 0) // 新点从 r: 0 开始
         .attr('fill', d => colorScale(d.hourFrac))
         .attr('stroke', 'black')
         .attr('stroke-width', 0.2)
@@ -290,13 +250,12 @@ function updateScatterPlot(data, filteredCommits) {
           d3.select(event.currentTarget).style('fill-opacity', 0.7);
           updateTooltipVisibility(false);
         })
-        .transition() // 添加过渡
-        .duration(500) // 0.5 秒过渡
+        .transition() // 新点过渡到目标半径
+        .duration(50) // 短时间过渡以减少卡顿
         .attr('r', d => rScale(d.totalLines)),
       update => update
-        .transition() // 为现有点添加位置过渡
-        .duration(500) // 0.5 秒过渡
-        .attr('class', '')
+        .transition() // 现有点平滑移动
+        .duration(50) // 短时间过渡
         .attr('cx', d => xScale(d.datetime))
         .attr('cy', d => yScale(d.hourFrac))
         .attr('r', d => rScale(d.totalLines))
@@ -409,7 +368,8 @@ async function main() {
     timeStyle: 'short',
   });
 
-  slider.addEventListener('input', (e) => {
+  // 添加 debounce 优化滑块事件
+  slider.addEventListener('input', debounce((e) => {
     const newProgress = +e.target.value;
     commitProgress = newProgress;
     selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
@@ -423,43 +383,15 @@ async function main() {
     updateScatterPlot(data, filteredCommits);
     lastCommitProgress = newProgress;
     prevFilteredCommits = [...filteredCommits];
+  }, 16)); // 约 60fps 的更新间隔
 
-    // Step 2.1：添加文件单元可视化
-    let lines = filteredCommits.flatMap((d) => d.lines);
-    let files = [];
-    files = d3
-      .groups(lines, (d) => d.file)
-      .map(([name, lines]) => {
-        return { name, lines };
-      });
-
-    // Step 2.3：按行数降序排序
-    files = d3.sort(files, (d) => -d.lines.length);
-
-    // 清除现有文件可视化内容
-    d3.select('.files').selectAll('div').remove();
-
-    // 创建文件可视化
-    let filesContainer = d3.select('.files').selectAll('div').data(files).enter().append('div');
-
-    // Step 2.1 & 2.2：在 <dt> 中显示文件名和行数
-    filesContainer.append('dt')
-      .append('code')
-      .html(d => `${d.name} <small style="display: block; font-size: 0.75em; opacity: 0.7;">${d.lines.length} lines</small>`);
-
-    // Step 2.2：为每行添加一个 <div class="line">
-    filesContainer.append('dd')
-      .selectAll('div')
-      .data(d => d.lines)
-      .enter()
-      .append('div')
-      .attr('class', 'line');
-
-    // Step 2.4：按技术类型给点上色
-    let fileTypeColors = d3.scaleOrdinal(d3.schemeTableau10);
-    d3.select('.files').selectAll('.line')
-      .style('background', d => fileTypeColors(d.type));
-  });
+  function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+  }
 }
 
 main();
