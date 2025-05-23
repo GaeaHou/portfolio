@@ -143,27 +143,39 @@ function updateScatterPlot(data, filteredCommits) {
   
     const dots = svg.append('g').attr('class', 'dots');
     dots.selectAll('circle')
-      .data(sortedCommits)
-      .join('circle')
-      .attr('cx', d => xScale(d.datetime))
-      .attr('cy', d => yScale(d.hourFrac))
-      .attr('r', d => rScale(d.totalLines))
-      .attr('fill', d => colorScale(d.hourFrac))
-      .attr('stroke', 'black')
-      .attr('stroke-width', 0.2)
-      .style('fill-opacity', 0.7)
-      .attr('style', d => `--r: ${rScale(d.totalLines)}`)
-      .on('mouseenter', (event, commit) => {
-        d3.select(event.currentTarget).style('fill-opacity', 1);
-        renderTooltipContent(commit);
-        updateTooltipVisibility(true);
-        updateTooltipPosition(event);
-      })
-      .on('mousemove', updateTooltipPosition)
-      .on('mouseleave', (event) => {
-        d3.select(event.currentTarget).style('fill-opacity', 0.7);
-        updateTooltipVisibility(false);
-      });
+      .data(sortedCommits, d => d.id)
+      .join(
+        enter => enter.append('circle')
+          .attr('cx', d => xScale(d.datetime))
+          .attr('cy', d => yScale(d.hourFrac))
+          .attr('r', d => rScale(d.totalLines)) // 目标半径
+          .attr('fill', d => colorScale(d.hourFrac))
+          .attr('stroke', 'black')
+          .attr('stroke-width', 0.2)
+          .style('fill-opacity', 0.7)
+          .attr('style', d => `--r: ${rScale(d.totalLines)}`)
+          .on('mouseenter', (event, commit) => {
+            d3.select(event.currentTarget).style('fill-opacity', 1);
+            renderTooltipContent(commit);
+            updateTooltipVisibility(true);
+            updateTooltipPosition(event);
+          })
+          .on('mousemove', updateTooltipPosition)
+          .on('mouseleave', (event) => {
+            d3.select(event.currentTarget).style('fill-opacity', 0.7);
+            updateTooltipVisibility(false);
+          }),
+        update => update
+          .attr('cx', d => xScale(d.datetime))
+          .attr('cy', d => yScale(d.hourFrac))
+          .attr('r', d => rScale(d.totalLines))
+          .attr('fill', d => colorScale(d.hourFrac))
+          .attr('stroke', 'black')
+          .attr('stroke-width', 0.2)
+          .style('fill-opacity', 0.7)
+          .attr('style', d => `--r: ${rScale(d.totalLines)}`),
+        exit => exit.remove()
+      );
   
     // ✅ 添加图例（颜色条）
     const legendWidth = 300;
