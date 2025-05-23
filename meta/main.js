@@ -6,6 +6,17 @@ let timeScale;
 let filteredCommits = [];
 let prevFilteredCommits = []; // 记录上一次的 filteredCommits
 
+
+// Step 3.1: Add global variables for scrollytelling
+let NUM_ITEMS = 100; // Ideally, let this value be the length of your commit history
+let ITEM_HEIGHT = 30; // Feel free to change
+let VISIBLE_COUNT = 10; // Feel free to change as well
+let totalHeight = (NUM_ITEMS - 1) * ITEM_HEIGHT;
+const scrollContainer = d3.select('#scroll-container');
+const spacer = d3.select('#spacer');
+spacer.style('height', `${totalHeight}px`);
+const itemsContainer = d3.select('#items-container');
+
 async function loadData() {
   const data = await d3.csv('loc.csv', (row) => ({
     ...row,
@@ -346,6 +357,29 @@ function updateTooltipPosition(event) {
   tooltip.style.left = `${event.clientX + 10}px`;
   tooltip.style.top = `${event.clientY + 10}px`;
 }
+// Step 3.1: Implement renderItems function
+function renderItems(startIndex) {
+  // Clear things off
+  itemsContainer.selectAll('div').remove();
+  const endIndex = Math.min(startIndex + VISIBLE_COUNT, commits.length);
+  let newCommitSlice = commits.slice(startIndex, endIndex);
+
+  // TODO: Update the scatterplot
+  updateScatterPlot(data, newCommitSlice);
+
+  // Re-bind the commit data to the container and represent each using a div
+  itemsContainer.selectAll('div')
+    .data(newCommitSlice)
+    .enter()
+    .append('div')
+    .attr('class', 'item')
+    .html(d => `
+      <a href="${d.url}" target="_blank">${d.id}</a>
+      <span> by ${d.author} on ${d.datetime.toLocaleDateString()}</span>
+    `)
+    .style('position', 'absolute')
+    .style('top', (_, idx) => `${idx * ITEM_HEIGHT}px`);
+}
 
 async function main() {
   const data = await loadData();
@@ -361,6 +395,17 @@ async function main() {
   renderCommitInfo(data, filteredCommits);
   updateScatterPlot(data, filteredCommits);
   prevFilteredCommits = [...filteredCommits]; // 初始化 prevFilteredCommits
+
+  // Step 3.1: Add scroll event listener
+  scrollContainer.on('scroll', () => {
+    const scrollTop = scrollContainer.property('scrollTop');
+    let startIndex = Math.floor(scrollTop / ITEM_HEIGHT);
+    startIndex = Math.max(
+      0,
+      Math.min(startIndex, commits.length - VISIBLE_COUNT),
+    );
+    renderItems(startIndex);
+  });
 
   const slider = document.getElementById('time-slider');
   const selectedTime = document.getElementById('selectedTime');
