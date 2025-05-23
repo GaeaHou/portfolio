@@ -1,6 +1,7 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 
 let commitProgress = 100;
+let lastCommitProgress = 100;
 let timeScale; // 让时间比例尺全局可访问
 let filteredCommits = [];
 
@@ -368,40 +369,40 @@ function renderLanguageBreakdown(selection) {
     }
   }
 
-  async function main() {
-    const data = await loadData();
-    const commits = processCommits(data);
-  
-    timeScale = d3.scaleTime(
-      [d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)],
-      [0, 100]
-    );
-  
-    let commitMaxTime = timeScale.invert(commitProgress);
-    filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
-    renderCommitInfo(data, filteredCommits);
-    updateScatterPlot(data, filteredCommits);
-  
-    const slider = document.getElementById('time-slider');
-    const selectedTime = document.getElementById('selectedTime');
+async function main() {
+  const data = await loadData();
+  const commits = processCommits(data);
+
+  timeScale = d3.scaleTime(
+    [d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)],
+    [0, 100]
+  );
+
+  let commitMaxTime = timeScale.invert(commitProgress);
+  filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
+  renderCommitInfo(data, filteredCommits);
+  updateScatterPlot(data, filteredCommits);
+
+  const slider = document.getElementById('time-slider');
+  const selectedTime = document.getElementById('selectedTime');
+  selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
+    dateStyle: 'long',
+    timeStyle: 'short',
+  });
+
+  slider.addEventListener('input', (e) => {
+    const newProgress = +e.target.value;
+    commitProgress = newProgress;
     selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
       dateStyle: 'long',
       timeStyle: 'short',
     });
-  
-    slider.addEventListener('input', (e) => {
-      const newProgress = +e.target.value;
-      commitProgress = newProgress;
-      selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
-        dateStyle: 'long',
-        timeStyle: 'short',
-      });
-  
-      commitMaxTime = timeScale.invert(commitProgress);
-      filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
-      updateScatterPlot(data, filteredCommits);
-      lastCommitProgress = newProgress; // 更新 lastCommitProgress
-    });
-  }
+
+    commitMaxTime = timeScale.invert(commitProgress);
+    filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
+    updateScatterPlot(data, filteredCommits);
+    lastCommitProgress = newProgress; // 更新 lastCommitProgress
+  });
+}
   
 main();
