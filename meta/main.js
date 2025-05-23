@@ -1,5 +1,8 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 
+let commitProgress = 100;
+let timeScale; // 让时间比例尺全局可访问
+
 async function loadData() {
     const data = await d3.csv('loc.csv', (row) => ({
       ...row,
@@ -343,23 +346,24 @@ function renderLanguageBreakdown(selection) {
     renderCommitInfo(data, commits);
     renderScatterPlot(data, commits);
 
-    let commitProgress = 100;
-    let timeScale = d3.scaleTime(
+    timeScale = d3.scaleTime(
       [d3.min(commits, (d) => d.datetime), d3.max(commits, (d) => d.datetime)],
-      [0, 100],
+      [0, 100]
     );
-    const selectedTime = d3.select('#selectedTime');
-    selectedTime.text(timeScale.invert(commitProgress).toLocaleString());
-    let commitMaxTime = timeScale.invert(commitProgress);
-    d3.select('#commitSlider').on('input', function() {
-      console.log('Slider moved!');
+    const slider = document.getElementById('progress-slider');
+    const selectedTime = document.getElementById('selectedTime');
+    selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
+      dateStyle: "long",
+      timeStyle: "short"
     });
-    d3.select('#commitSlider').on('input', function() {
-      commitProgress = +this.value; // 更新 commitProgress
-      console.log('Slider value:', commitProgress); // 调试：检查 slider 值
-      console.log('Mapped time:', timeScale.invert(commitProgress)); // 调试：检查映射时间
-      selectedTime.text(timeScale.invert(commitProgress).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' }));
+    slider.addEventListener('input', (e) => {
+      commitProgress = +e.target.value;
+      selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
+        dateStyle: "long",
+        timeStyle: "short"
+      });
     });
+    
 
   }
   
