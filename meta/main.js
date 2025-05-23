@@ -350,7 +350,7 @@ function renderLanguageBreakdown(selection) {
       [d3.min(commits, (d) => d.datetime), d3.max(commits, (d) => d.datetime)],
       [0, 100]
     );
-    const slider = document.getElementById('progress-slider');
+    const slider = document.getElementById('time-slider');
     const selectedTime = document.getElementById('selectedTime');
     selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
       dateStyle: "long",
