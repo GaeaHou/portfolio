@@ -233,7 +233,7 @@ function updateScatterPlot(data, filteredCommits) {
         .attr('class', d => (isMovingForward && newCommits.some(nc => nc.id === d.id)) ? 'new-circle' : '')
         .attr('cx', d => xScale(d.datetime))
         .attr('cy', d => yScale(d.hourFrac))
-        .attr('r', d => rScale(d.totalLines))
+        .attr('r', 0) // 新点从 r: 0 开始，过渡到目标值
         .attr('fill', d => colorScale(d.hourFrac))
         .attr('stroke', 'black')
         .attr('stroke-width', 0.2)
@@ -249,9 +249,14 @@ function updateScatterPlot(data, filteredCommits) {
         .on('mouseleave', (event) => {
           d3.select(event.currentTarget).style('fill-opacity', 0.7);
           updateTooltipVisibility(false);
-        }),
+        })
+        .transition() // 添加过渡
+        .duration(500) // 0.5 秒过渡
+        .attr('r', d => rScale(d.totalLines)),
       update => update
-        .attr('class', '') // 移除 new-circle 类，确保现有点无过渡
+        .transition() // 为现有点添加位置过渡
+        .duration(500) // 0.5 秒过渡
+        .attr('class', '')
         .attr('cx', d => xScale(d.datetime))
         .attr('cy', d => yScale(d.hourFrac))
         .attr('r', d => rScale(d.totalLines))
