@@ -488,7 +488,7 @@ dl.info dd {
 }
 
 circle {
-  transition: all 200ms, r calc(var(--r) * 100ms);
+  transition: r 0.5s ease, cx 0.5s ease, cy 0.5s ease, fill-opacity 0.5s ease;
 }
 
 @starting-style {
