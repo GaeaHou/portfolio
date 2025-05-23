@@ -251,11 +251,11 @@ function updateScatterPlot(data, filteredCommits) {
           updateTooltipVisibility(false);
         })
         .transition() // 添加过渡
-        .duration(500) // 0.5 秒过渡
+        .duration(50) // 0.5 秒过渡
         .attr('r', d => rScale(d.totalLines)),
       update => update
         .transition() // 为现有点添加位置过渡
-        .duration(500) // 0.5 秒过渡
+        .duration(50) // 0.5 秒过渡
         .attr('class', '')
         .attr('cx', d => xScale(d.datetime))
         .attr('cy', d => yScale(d.hourFrac))
