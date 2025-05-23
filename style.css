@@ -400,34 +400,28 @@ time {
   margin-top: 0.2em;
 }
 
-/* ===== Summary Stats 横向布局 ===== */
+/* ===== Summary Stats 卡片横向布局 ===== */
 .summary-panel {
   padding: 2em 0;
 }
 
-.summary-panel h1 {
-  font-size: 3em;
-  border-bottom: none; /* 移除下边框，与图片一致 */
-  margin-bottom: 0.3em;
-}
-
-.summary-panel p {
-  font-size: 1em;
-  color: #666;
-  margin-bottom: 1em;
+.summary-panel h2 {
+  font-size: 2em;
+  font-weight: bold;
+  margin-bottom: 1.2em;
 }
 
 .stat-grid {
   display: flex;
   flex-wrap: wrap;
-  gap: 3em 2em; /* 图片中卡片间距较大 */
+  gap: 3em 2em;
   justify-content: flex-start;
   align-items: flex-start;
-  flex-direction: row;
+  flex-direction: row; /* 强制横向排列 */
 }
 
 .stat-card {
-  flex: 0 0 auto; /* 不拉伸 */
+  flex: 0 0 auto;  /* 不拉伸 */
   text-align: left;
   min-width: 100px;
 }
@@ -438,7 +432,6 @@ time {
   font-weight: 600;
   letter-spacing: 0.05em;
   margin-bottom: 0.25em;
-  text-transform: uppercase; /* 图片中标签是大写 */
 }
 
 .stat-value {
@@ -447,26 +440,6 @@ time {
   color: #111;
 }
 
-/* ===== Summary Stats 暗色模式 ===== */
-html[color-scheme="dark"] .stat-label {
-  color: #c4c4c4;
-}
-
-html[color-scheme="dark"] .stat-value {
-  color: #ffffff;
-}
-
-/* 媒体查询后备，确保自动模式下暗色模式样式生效 */
-@media (prefers-color-scheme: dark) {
-  html:not([color-scheme="light"]) {
-    .stat-label {
-      color: #c4c4c4;
-    }
-    .stat-value {
-      color: #ffffff;
-    }
-  }
-}
 .gridlines line {
   stroke: #ccc;
   stroke-opacity: 0.3;
@@ -515,13 +488,9 @@ dl.info dd {
 }
 
 circle {
-  transition: all 300ms ease-in-out, opacity 300ms ease-in-out;
+  transition: 200ms;
   transform-origin: center;
   transform-box: fill-box;
-  @starting-style {
-    r: 0;
-    opacity: 0;
-  }
 }
 
 circle:hover {
@@ -809,65 +778,4 @@ html[color-scheme="dark"] h2 {
 html[color-scheme="dark"] .color-scheme {
   background-color: rgba(30, 30, 30, 0.85) !important;
   color: white;
-}
-
-/* ===== 滑动条容器样式 ===== */
-.slider-container {
-  display: flex;
-  align-items: baseline;
-  margin-top: 1em;
-  margin-bottom: 2em;
-  width: 100%;
-  max-width: 100ch; /* 与页面内容宽度一致 */
-}
-
-.slider-label {
-  font-size: 0.9em;
-  display: flex;
-  align-items: center;
-  gap: 1em; /* 标签、滑动条和时间之间的间距 */
-  width: 100%;
-}
-
-#time-slider {
-  flex: 1; /* 滑动条占据剩余空间 */
-  min-width: 300px; /* 最小宽度，确保滑动条足够长 */
-  max-width: 600px; /* 最大宽度，防止过长 */
-}
-
-#selectedTime {
-  margin-left: auto; /* 时间靠右对齐 */
-  font-size: 0.9em;
-}
-
-/* 调整滑动条外观（可选，增强视觉效果） */
-#time-slider::-webkit-slider-thumb {
-  background: #007acc; /* 亮色模式下滑动条手柄颜色 */
-  cursor: pointer;
-}
-
-#time-slider::-moz-range-thumb {
-  background: #007acc;
-  cursor: pointer;
-}
-
-/* 暗色模式下滑动条手柄颜色 */
-html[color-scheme="dark"] #time-slider::-webkit-slider-thumb {
-  background: #37996b;
-}
-
-html[color-scheme="dark"] #time-slider::-moz-range-thumb {
-  background: #37996b;
-}
-
-/* 媒体查询后备，确保自动模式下暗色模式样式生效 */
-@media (prefers-color-scheme: dark) {
-  html:not([color-scheme="light"]) {
-    #time-slider::-webkit-slider-thumb {
-      background: #37996b;
-    }
-    #time-slider::-moz-range-thumb {
-      background: #37996b;
-    }
-  }
 }
