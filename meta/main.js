@@ -233,7 +233,7 @@ function updateScatterPlot(data, filteredCommits) {
         .attr('class', d => (isMovingForward && newCommits.some(nc => nc.id === d.id)) ? 'new-circle' : '')
         .attr('cx', d => xScale(d.datetime))
         .attr('cy', d => yScale(d.hourFrac))
-        .attr('r', 0) // 新点从 r: 0 开始
+        .attr('r', 0) // 新点从 r: 0 开始，过渡到目标值
         .attr('fill', d => colorScale(d.hourFrac))
         .attr('stroke', 'black')
         .attr('stroke-width', 0.2)
@@ -250,12 +250,13 @@ function updateScatterPlot(data, filteredCommits) {
           d3.select(event.currentTarget).style('fill-opacity', 0.7);
           updateTooltipVisibility(false);
         })
-        .transition() // 新点过渡到目标半径
-        .duration(50) // 短时间过渡以减少卡顿
+        .transition() // 添加过渡
+        .duration(50) // 0.5 秒过渡
         .attr('r', d => rScale(d.totalLines)),
       update => update
-        .transition() // 现有点平滑移动
-        .duration(50) // 短时间过渡
+        .transition() // 为现有点添加位置过渡
+        .duration(50) // 0.5 秒过渡
+        .attr('class', '')
         .attr('cx', d => xScale(d.datetime))
         .attr('cy', d => yScale(d.hourFrac))
         .attr('r', d => rScale(d.totalLines))
@@ -368,8 +369,7 @@ async function main() {
     timeStyle: 'short',
   });
 
-  // 添加 debounce 优化滑块事件
-  slider.addEventListener('input', debounce((e) => {
+  slider.addEventListener('input', (e) => {
     const newProgress = +e.target.value;
     commitProgress = newProgress;
     selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
@@ -382,16 +382,8 @@ async function main() {
     renderCommitInfo(data, filteredCommits);
     updateScatterPlot(data, filteredCommits);
     lastCommitProgress = newProgress;
-    prevFilteredCommits = [...filteredCommits];
-  }, 16)); // 约 60fps 的更新间隔
-
-  function debounce(func, wait) {
-    let timeout;
-    return function (...args) {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func.apply(this, args), wait);
-    };
-  }
+    prevFilteredCommits = [...filteredCommits]; // 更新 prevFilteredCommits
+  });
 }
 
 main();
