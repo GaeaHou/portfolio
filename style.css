@@ -790,8 +790,8 @@ html[color-scheme="dark"] .color-scheme {
 }
 
 input[type="range"] {
-  width: 85vw;
-  max-width: 1000px;
+  width: 940px;
+  max-width: 100%;
   margin-left: 1em;
   margin-right: 1em;
   /* 你可以根据实际情况再微调 */
