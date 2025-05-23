@@ -2,6 +2,7 @@ import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 
 let commitProgress = 100;
 let timeScale; // 让时间比例尺全局可访问
+let filteredCommits = [];
 
 async function loadData() {
     const data = await d3.csv('loc.csv', (row) => ({
@@ -46,6 +47,7 @@ function processCommits(data) {
       });
 }
 
+
 function renderCommitInfo(data, commits) {
     d3.select("#stats").html(""); 
     
@@ -87,11 +89,11 @@ function renderCommitInfo(data, commits) {
   
 
 
-  function renderScatterPlot(data, commits) {
+function updateScatterPlot(data, filteredCommits) {
+    d3.select('svg').remove(); // 先清空原 svg
     const width = 1000;
     const height = 600;
     const margin = { top: 10, right: 10, bottom: 40, left: 50 };
-  
     const usableArea = {
       top: margin.top,
       right: width - margin.right,
@@ -108,7 +110,7 @@ function renderCommitInfo(data, commits) {
       .style('overflow', 'visible');
   
     const xScale = d3.scaleTime()
-      .domain(d3.extent(commits, d => d.datetime))
+      .domain(d3.extent(filteredCommits, d => d.datetime))
       .range([usableArea.left, usableArea.right])
       .nice();
   
@@ -120,7 +122,7 @@ function renderCommitInfo(data, commits) {
       .domain([0, 24])
       .interpolator(d3.interpolateWarm);
   
-    const [minLines, maxLines] = d3.extent(commits, d => d.totalLines);
+    const [minLines, maxLines] = d3.extent(filteredCommits, d => d.totalLines);
     const rScale = d3.scaleSqrt()
       .domain([minLines, maxLines])
       .range([3, 20]);
@@ -137,11 +139,10 @@ function renderCommitInfo(data, commits) {
       .attr('transform', `translate(0, ${usableArea.bottom})`)
       .call(d3.axisBottom(xScale));
   
-    const sortedCommits = d3.sort(commits, d => -d.totalLines);
+    const sortedCommits = d3.sort(filteredCommits, d => -d.totalLines);
   
-    svg.append('g')
-      .attr('class', 'dots')
-      .selectAll('circle')
+    const dots = svg.append('g').attr('class', 'dots');
+    dots.selectAll('circle')
       .data(sortedCommits)
       .join('circle')
       .attr('cx', d => xScale(d.datetime))
@@ -339,17 +340,21 @@ function renderLanguageBreakdown(selection) {
     }
   }
 
-  async function main() {
+async function main() {
     
     const data = await loadData();
     const commits = processCommits(data);
-    renderCommitInfo(data, commits);
-    renderScatterPlot(data, commits);
 
     timeScale = d3.scaleTime(
       [d3.min(commits, (d) => d.datetime), d3.max(commits, (d) => d.datetime)],
       [0, 100]
     );
+
+    let commitMaxTime = timeScale.invert(commitProgress);
+    filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
+    renderCommitInfo(data, filteredCommits);
+    updateScatterPlot(data, filteredCommits);
+
     const slider = document.getElementById('time-slider');
     const selectedTime = document.getElementById('selectedTime');
     selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
@@ -357,13 +362,17 @@ function renderLanguageBreakdown(selection) {
       timeStyle: "short"
     });
     slider.addEventListener('input', (e) => {
-      commitProgress = +e.target.value;
-      selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
-        dateStyle: "long",
-        timeStyle: "short"
-      });
+    commitProgress = +e.target.value;
+    selectedTime.textContent = timeScale.invert(commitProgress).toLocaleString(undefined, {
+      dateStyle: "long",
+      timeStyle: "short"
     });
-    
+
+    commitMaxTime = timeScale.invert(commitProgress);
+    filteredCommits = commits.filter(d => d.datetime <= commitMaxTime);
+    updateScatterPlot(data, filteredCommits);
+  });
+
 
   }
   
