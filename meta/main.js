@@ -5,6 +5,7 @@ let lastCommitProgress = 100;
 let timeScale;
 let filteredCommits = [];
 let prevFilteredCommits = []; // 记录上一次的 filteredCommits
+let commits;
 
 let NUM_ITEMS = 100; // Ideally, let this value be the length of your commit history
 let ITEM_HEIGHT = 100; // Feel free to change
@@ -66,16 +67,12 @@ function processCommits(data) {
     });
 }
 function renderItems(startIndex) {
-  // Clear things off
   itemsContainer.selectAll('div').remove();
   const endIndex = Math.min(startIndex + VISIBLE_COUNT, commits.length);
   let newCommitSlice = commits.slice(startIndex, endIndex);
-  // 更新散点图
   updateScatterPlot(data, newCommitSlice);
-  // Re-bind the commit data to the container and represent each using a div
   filteredCommits = newCommitSlice;
   displayCommitFiles();
-
   itemsContainer.selectAll('div')
     .data(newCommitSlice)
     .enter()
@@ -425,7 +422,7 @@ function displayCommitFiles() {
 
 async function main() {
   const data = await loadData();
-  const commits = processCommits(data);
+  commits = processCommits(data);
 
   timeScale = d3.scaleTime(
     [d3.min(commits, d => d.datetime), d3.max(commits, d => d.datetime)],
