@@ -870,7 +870,7 @@ dd {
 }
 
 .item {
-  height: 30px;
+  height: 100px; /* Updated from 30px to 100px */
   padding: 10px;
   box-sizing: border-box;
   border-bottom: 2px solid #eee;
