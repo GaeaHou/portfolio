@@ -251,11 +251,11 @@ function updateScatterPlot(data, filteredCommits) {
           updateTooltipVisibility(false);
         })
         .transition() // 添加过渡
-        .duration(50) // 0.5 秒过渡
+        .duration(500) // 0.5 秒过渡
         .attr('r', d => rScale(d.totalLines)),
       update => update
         .transition() // 为现有点添加位置过渡
-        .duration(50) // 0.5 秒过渡
+        .duration(500) // 0.5 秒过渡
         .attr('class', '')
         .attr('cx', d => xScale(d.datetime))
         .attr('cy', d => yScale(d.hourFrac))
@@ -382,7 +382,43 @@ async function main() {
     renderCommitInfo(data, filteredCommits);
     updateScatterPlot(data, filteredCommits);
     lastCommitProgress = newProgress;
-    prevFilteredCommits = [...filteredCommits]; // 更新 prevFilteredCommits
+    prevFilteredCommits = [...filteredCommits];
+
+    // Step 2.1：添加文件单元可视化
+    let lines = filteredCommits.flatMap((d) => d.lines);
+    let files = [];
+    files = d3
+      .groups(lines, (d) => d.file)
+      .map(([name, lines]) => {
+        return { name, lines };
+      });
+
+    // Step 2.3：按行数降序排序
+    files = d3.sort(files, (d) => -d.lines.length);
+
+    // 清除现有文件可视化内容
+    d3.select('.files').selectAll('div').remove();
+
+    // 创建文件可视化
+    let filesContainer = d3.select('.files').selectAll('div').data(files).enter().append('div');
+
+    // Step 2.1 & 2.2：在 <dt> 中显示文件名和行数
+    filesContainer.append('dt')
+      .append('code')
+      .html(d => `${d.name} <small style="display: block; font-size: 0.75em; opacity: 0.7;">${d.lines.length} lines</small>`);
+
+    // Step 2.2：为每行添加一个 <div class="line">
+    filesContainer.append('dd')
+      .selectAll('div')
+      .data(d => d.lines)
+      .enter()
+      .append('div')
+      .attr('class', 'line');
+
+    // Step 2.4：按技术类型给点上色
+    let fileTypeColors = d3.scaleOrdinal(d3.schemeTableau10);
+    d3.select('.files').selectAll('.line')
+      .style('background', d => fileTypeColors(d.type));
   });
 }
 
