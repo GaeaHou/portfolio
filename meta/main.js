@@ -352,10 +352,15 @@ function renderLanguageBreakdown(selection) {
     selectedTime.text(timeScale.invert(commitProgress).toLocaleString());
     let commitMaxTime = timeScale.invert(commitProgress);
     d3.select('#commitSlider').on('input', function() {
+      console.log('Slider moved!');
+    });
+    d3.select('#commitSlider').on('input', function() {
       commitProgress = +this.value; // 更新 commitProgress
+      console.log('Slider value:', commitProgress); // 调试：检查 slider 值
+      console.log('Mapped time:', timeScale.invert(commitProgress)); // 调试：检查映射时间
       selectedTime.text(timeScale.invert(commitProgress).toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' }));
     });
-    
+
   }
   
 main();
