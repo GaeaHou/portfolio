@@ -4,11 +4,13 @@ let commitProgress = 100;
 let lastCommitProgress = 100;
 let timeScale;
 let filteredCommits = [];
-let prevFilteredCommits = [];
-let data; // 提升为全局变量以供 renderItems 使用
-let commits; // 提升为全局变量以供 renderItems 使用
+let prevFilteredCommits = []; // 记录上一次的 filteredCommits
 
-let NUM_ITEMS = 100;
+let commits; // 全局变量
+let data;   // 全局变量
+
+// Step 3.1: Add global variables for scrollytelling
+let NUM_ITEMS = 100; // 初始值，稍后更新为 commits.length
 let ITEM_HEIGHT = 100; // 增加到 100px 以容纳叙述内容
 let VISIBLE_COUNT = 10;
 let totalHeight = (NUM_ITEMS - 1) * ITEM_HEIGHT;
@@ -144,6 +146,7 @@ function updateScatterPlot(data, filteredCommits) {
 
     const legendWidth = 300;
     const legendHeight = 12;
+
     const legendGroup = svg.append("g")
       .attr("class", "legend")
       .attr("transform", `translate(${(width - legendWidth) / 2}, ${height + 40})`);
@@ -348,21 +351,29 @@ function updateTooltipPosition(event) {
   tooltip.style.top = `${event.clientY + 10}px`;
 }
 
+// Step 3.2: Implement renderItems with dummy narrative
 function renderItems(startIndex) {
+  // Clear existing items
   itemsContainer.selectAll('div').remove();
   const endIndex = Math.min(startIndex + VISIBLE_COUNT, commits.length);
   let newCommitSlice = commits.slice(startIndex, endIndex);
+
+  // Check if newCommitSlice is valid
+  if (!newCommitSlice || newCommitSlice.length === 0) return;
+
+  // Update the scatterplot
   updateScatterPlot(data, newCommitSlice);
 
+  // Bind data and append narrative
   itemsContainer.selectAll('div')
     .data(newCommitSlice)
     .enter()
     .append('div')
     .attr('class', 'item')
     .style('position', 'absolute')
-    .style('top', (_, idx) => `${idx * ITEM_HEIGHT}px`)
+    .style('top', (d, idx) => `${(startIndex + idx) * ITEM_HEIGHT}px`) // 使用 startIndex + idx 计算 top
     .html(d => {
-      const index = startIndex + d3.select(this).datum().index; // 计算当前项的索引
+      const index = startIndex + d3.select(this.parentNode).selectAll('div').nodes().indexOf(this);
       const fileCount = d3.rollups(d.lines, v => v.length, d => d.file).length;
       return `
         <p>
@@ -379,6 +390,7 @@ async function main() {
   data = await loadData();
   commits = processCommits(data);
 
+  // Update NUM_ITEMS based on actual commit length
   NUM_ITEMS = commits.length;
   totalHeight = (NUM_ITEMS - 1) * ITEM_HEIGHT;
   spacer.style('height', `${totalHeight}px`);
@@ -394,6 +406,7 @@ async function main() {
   updateScatterPlot(data, filteredCommits);
   prevFilteredCommits = [...filteredCommits];
 
+  // Add scroll event listener after data is ready
   scrollContainer.on('scroll', () => {
     const scrollTop = scrollContainer.property('scrollTop');
     let startIndex = Math.floor(scrollTop / ITEM_HEIGHT);
@@ -423,6 +436,7 @@ async function main() {
     lastCommitProgress = newProgress;
     prevFilteredCommits = [...filteredCommits];
 
+    // Step 2.1：添加文件单元可视化
     let lines = filteredCommits.flatMap((d) => d.lines);
     let files = [];
     files = d3
@@ -431,16 +445,21 @@ async function main() {
         return { name, lines };
       });
 
+    // Step 2.3：按行数降序排序
     files = d3.sort(files, (d) => -d.lines.length);
 
+    // 清除现有文件可视化内容
     d3.select('.files').selectAll('div').remove();
 
+    // 创建文件可视化
     let filesContainer = d3.select('.files').selectAll('div').data(files).enter().append('div');
 
+    // Step 2.1 & 2.2：在 <dt> 中显示文件名和行数
     filesContainer.append('dt')
       .append('code')
       .html(d => `${d.name} <small style="display: block; font-size: 0.75em; opacity: 0.7;">${d.lines.length} lines</small>`);
 
+    // Step 2.2：为每行添加一个 <div class="line">
     filesContainer.append('dd')
       .selectAll('div')
       .data(d => d.lines)
@@ -448,6 +467,7 @@ async function main() {
       .append('div')
       .attr('class', 'line');
 
+    // Step 2.4：按技术类型给点上色
     let fileTypeColors = d3.scaleOrdinal(d3.schemeTableau10);
     d3.select('.files').selectAll('.line')
       .style('background', d => fileTypeColors(d.type));
