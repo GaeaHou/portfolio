@@ -412,7 +412,7 @@ function renderLanguageBreakdown(selection) {
     }
 }
 
-// [Step 2.1] 添加 updateFileDisplay 函数
+// [Step 2.2] 修改 updateFileDisplay 函数以实现单位可视化
 function updateFileDisplay(filteredCommits) {
   let lines = filteredCommits.flatMap((d) => d.lines);
   let files = d3
@@ -428,13 +428,30 @@ function updateFileDisplay(filteredCommits) {
     .join(
       (enter) =>
         enter.append('div').call((div) => {
-          div.append('dt').append('code');
+          div.append('dt').call((dt) => {
+            dt.append('code');
+            dt.append('small');
+          });
           div.append('dd');
         }),
     );
 
-  filesContainer.select('dt > code').text((d) => d.name);
-  filesContainer.select('dd').text((d) => `${d.lines.length} lines`);
+  // 设置文件名和行数
+  filesContainer
+    .select('dt > code')
+    .html((d) => d.name);
+  filesContainer
+    .select('dt > small')
+    .html((d) => `${d.lines.length} lines`)
+    .style('display', 'block');
+
+  // 为每行代码添加一个点
+  filesContainer
+    .select('dd')
+    .selectAll('div')
+    .data((d) => d.lines)
+    .join('div')
+    .attr('class', 'loc');
 }
 
 function onTimeSliderChange(data) {
@@ -446,7 +463,6 @@ function onTimeSliderChange(data) {
   filteredCommits = commits.filter((d) => d.datetime <= commitMaxTime);
   updateScatterPlot(data, filteredCommits);
   renderCommitInfo(data, filteredCommits);
-  // [Step 2.1] 调用 updateFileDisplay 更新文件显示
   updateFileDisplay(filteredCommits);
 }
 
@@ -467,7 +483,6 @@ async function main() {
     d3.select('#commit-progress').on('input', () => onTimeSliderChange(data));
     renderCommitInfo(data, commits);
     renderScatterPlot(data, commits);
-    // [Step 2.1] 初始调用 updateFileDisplay
     updateFileDisplay(commits);
 }
 
