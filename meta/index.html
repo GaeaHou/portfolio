@@ -9,34 +9,27 @@
   <script type="module" src="./main.js"></script>
 </head>
 <body>
+
   <section class="summary-panel">
     <h1>Meta</h1>
-    <p>This page includes stats about the code of this website.</p>
     <div class="stat-grid" id="stats"></div>
-    <div class="slider-container">
-      <label for="time-slider" class="slider-label">
-        Show commits until:
-        <input type="range" id="time-slider" min="0" max="100" value="100">
-        <time id="selectedTime"></time>
-      </label>
-    </div>
-    <dl class="files">
-      <!-- 每个文件的一个 <div> 由 D3 动态生成 -->
-    </dl>
   </section>
 
+
   <h2 id="chart-title">Commits by time of day</h2>
-  <div id="scrollytelling">
-    <div id="scroll-container">
-      <div id="spacer"></div>
-      <div id="items-container"></div>
-    </div>
-    <div id="chart"></div>
-  </div>
+
+  <div id="chart"></div>
 
   <p id="selection-count">No commits selected</p>
-  <div id="language-breakdown" class="language-columns"></div>
+  <div id="language-breakdown" class="language-columns">
+    <div class="lang-block">
+      <div class="lang-name"></div>
+      <div class="lang-lines"></div>
+      <div class="lang-percent"></div>
+    </div>
+  </div>
 
+  <!-- ✅ 5. Tooltip -->
   <dl id="commit-tooltip" class="info tooltip" hidden>
     <dt>Commit</dt>
     <dd><a href="" id="commit-link" target="_blank"></a></dd>
@@ -49,5 +42,6 @@
     <dt>Lines edited</dt>
     <dd id="commit-lines"></dd>
   </dl>
+
 </body>
 </html>
