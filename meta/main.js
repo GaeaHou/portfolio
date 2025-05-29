@@ -1,4 +1,5 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
+import scrollama from 'https://cdn.jsdelivr.net/npm/scrollama@3.2.0/+esm';
 
 // [1.1] 添加全局变量 commitProgress、timeScale 和 commitMaxTime
 let commitProgress = 100;
@@ -16,7 +17,7 @@ let commits = null;
 async function loadData() {
     const data = await d3.csv('loc.csv', (row) => ({
       ...row,
-      line: Number(row.line), // or just +row.line
+      line: Number(row.line),
       depth: Number(row.depth),
       length: Number(row.length),
       date: new Date(row.date + 'T00:00' + row.timezone),
@@ -27,7 +28,7 @@ async function loadData() {
 }
 
 function processCommits(data) {
-    return d3
+    const commitData = d3
       .groups(data, (d) => d.commit)
       .map(([commit, lines]) => {
         let first = lines[0];
@@ -54,6 +55,9 @@ function processCommits(data) {
   
         return ret;
       });
+    
+    // 按 datetime 升序排序
+    return d3.sort(commitData, (a, b) => a.datetime - b.datetime);
 }
 
 function renderCommitInfo(data, commits) {
@@ -82,7 +86,6 @@ function renderCommitInfo(data, commits) {
       .append("section")
       .attr("class", "summary-panel");
   
-  
     const statRow = container.append("div").attr("class", "stat-grid");
   
     const cards = statRow.selectAll("div")
@@ -95,7 +98,6 @@ function renderCommitInfo(data, commits) {
     cards.append("div").attr("class", "stat-value").text(d => d.value);
 }
 
-// [1.2] 添加 updateScatterPlot 函数
 function updateScatterPlot(data, commits) {
   const width = 1000;
   const height = 600;
@@ -111,7 +113,6 @@ function updateScatterPlot(data, commits) {
 
   const svg = d3.select('#chart').select('svg');
 
-  // [1.2] 更新 xScale 的定义域
   xScale.domain(d3.extent(commits, (d) => d.datetime));
 
   const [minLines, maxLines] = d3.extent(commits, (d) => d.totalLines);
@@ -119,7 +120,6 @@ function updateScatterPlot(data, commits) {
 
   const xAxis = d3.axisBottom(xScale);
 
-  // [1.2] 清除并更新 x 轴
   const xAxisGroup = svg.select('g.x-axis');
   xAxisGroup.selectAll('*').remove();
   xAxisGroup.call(xAxis);
@@ -169,18 +169,15 @@ function renderScatterPlot(data, commits) {
       .attr('viewBox', `0 0 ${width} ${height + 60}`)
       .style('overflow', 'visible');
   
-    // [1.2] 初始化全局 xScale
     xScale = d3.scaleTime()
       .domain(d3.extent(commits, d => d.datetime))
       .range([usableArea.left, usableArea.right])
       .nice();
   
-    // [1.2] 初始化全局 yScale
     yScale = d3.scaleLinear()
       .domain([0, 24])
       .range([usableArea.bottom, usableArea.top]);
   
-    // [1.2] 初始化全局 colorScale
     colorScale = d3.scaleSequential()
       .domain([0, 24])
       .interpolator(d3.interpolateWarm);
@@ -235,7 +232,6 @@ function renderScatterPlot(data, commits) {
         updateTooltipVisibility(false);
       });
   
-    // 添加图例（颜色条）
     const legendWidth = 300;
     const legendHeight = 12;
 
@@ -412,16 +408,15 @@ function renderLanguageBreakdown(selection) {
     }
 }
 
-// [Step 2.3 & 2.4] 修改 updateFileDisplay 函数以排序文件并添加颜色
 function updateFileDisplay(filteredCommits) {
   let lines = filteredCommits.flatMap((d) => d.lines);
-  let colors = d3.scaleOrdinal(d3.schemeTableau10); // [Step 2.4] 创建技术颜色标度
+  let colors = d3.scaleOrdinal(d3.schemeTableau10);
   let files = d3
     .groups(lines, (d) => d.file)
     .map(([name, lines]) => {
       return { name, lines };
     })
-    .sort((a, b) => b.lines.length - a.lines.length); // [Step 2.3] 按行数降序排序
+    .sort((a, b) => b.lines.length - a.lines.length);
 
   let filesContainer = d3
     .select('#files')
@@ -438,7 +433,6 @@ function updateFileDisplay(filteredCommits) {
         }),
     );
 
-  // 设置文件名和行数
   filesContainer
     .select('dt > code')
     .html((d) => d.name);
@@ -447,14 +441,13 @@ function updateFileDisplay(filteredCommits) {
     .html((d) => `${d.lines.length} lines`)
     .style('display', 'block');
 
-  // 为每行代码添加一个点并设置颜色
   filesContainer
     .select('dd')
     .selectAll('div')
     .data((d) => d.lines)
     .join('div')
     .attr('class', 'loc')
-    .attr('style', (d) => `--color: ${colors(d.type)}`); // [Step 2.4] 基于技术类型设置颜色
+    .attr('style', (d) => `--color: ${colors(d.type)}`);
 }
 
 function onTimeSliderChange(data) {
@@ -487,7 +480,6 @@ async function main() {
     renderCommitInfo(data, commits);
     renderScatterPlot(data, commits);
     updateFileDisplay(commits);
-
     d3.select('#scatter-story')
       .selectAll('.step')
       .data(commits)
@@ -512,6 +504,29 @@ async function main() {
           Then I looked over all I had made, and I saw that it was very good.
         `,
       );
+
+    // 初始化 Scrollama
+    function onStepEnter(response) {
+      const commitDate = response.element.__data__.datetime;
+      commitMaxTime = commitDate;
+      commitProgress = timeScale(commitDate);
+      d3.select('#commit-time').text(
+        commitMaxTime.toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })
+      );
+      d3.select('#commit-progress').property('value', commitProgress);
+      filteredCommits = commits.filter((d) => d.datetime <= commitMaxTime);
+      updateScatterPlot(data, filteredCommits);
+      renderCommitInfo(data, filteredCommits);
+      updateFileDisplay(filteredCommits);
+    }
+
+    const scroller = scrollama();
+    scroller
+      .setup({
+        container: '#scrolly-1',
+        step: '#scrolly-1 .step',
+      })
+      .onStepEnter(onStepEnter);
 }
 
 main();
