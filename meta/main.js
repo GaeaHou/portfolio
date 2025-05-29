@@ -1,5 +1,4 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
-import scrollama from 'https://cdn.jsdelivr.net/npm/scrollama@3.2.0/+esm'; // [Step 3.3] 导入 Scrollama
 
 // [1.1] 添加全局变量 commitProgress、timeScale 和 commitMaxTime
 let commitProgress = 100;
@@ -54,8 +53,7 @@ function processCommits(data) {
         });
   
         return ret;
-      })
-      .sort((a, b) => a.datetime - b.datetime); // [Step 3.3] 按 datetime 排序
+      });
 }
 
 function renderCommitInfo(data, commits) {
@@ -471,54 +469,6 @@ function onTimeSliderChange(data) {
   updateFileDisplay(filteredCommits);
 }
 
-// [Step 3.2] 生成提交文本
-d3.select('#scatter-story')
-  .selectAll('.step')
-  .data(commits)
-  .join('div')
-  .attr('class', 'step')
-  .html(
-    (d, i) => `
-    On ${d.datetime.toLocaleString('en', {
-      dateStyle: 'full',
-      timeStyle: 'short',
-    })},
-    I made <a href="${d.url}" target="_blank">${
-      i > 0 ? 'another glorious commit' : 'my first commit, and it was glorious'
-    }</a>.
-    I edited ${d.totalLines} lines across ${
-      d3.rollups(
-        d.lines,
-        (D) => D.length,
-        (d) => d.file,
-      ).length
-    } files.
-    Then I looked over all I had made, and I saw that it was very good.
-  `,
-  )
-  .style('padding-bottom', '10rem'); // 确保每个步骤占用足够空间
-
-// [Step 3.3] 使用 Scrollama 更新散点图
-function onStepEnter(response) {
-  const commitDate = response.element.__data__.datetime;
-  commitMaxTime = commitDate;
-  filteredCommits = commits.filter((d) => d.datetime <= commitMaxTime);
-  updateScatterPlot(loadData(), filteredCommits); // 假设 loadData 返回数据
-  renderCommitInfo(loadData(), filteredCommits);
-  updateFileDisplay(filteredCommits);
-  d3.select('#commit-time').text(
-    commitMaxTime.toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })
-  );
-}
-
-const scroller = scrollama();
-scroller
-  .setup({
-    container: '#scrolly-1',
-    step: '#scrolly-1 .step',
-  })
-  .onStepEnter(onStepEnter);
-
 async function main() {
     const data = await loadData();
     commits = processCommits(data);
@@ -532,7 +482,7 @@ async function main() {
     commitMaxTime = timeScale.invert(commitProgress);
     d3.select('#commit-time').text(
       commitMaxTime.toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })
-  );
+    );
     d3.select('#commit-progress').on('input', () => onTimeSliderChange(data));
     renderCommitInfo(data, commits);
     renderScatterPlot(data, commits);
