@@ -412,14 +412,16 @@ function renderLanguageBreakdown(selection) {
     }
 }
 
-// [Step 2.2] 修改 updateFileDisplay 函数以实现单位可视化
+// [Step 2.3 & 2.4] 修改 updateFileDisplay 函数以排序文件并添加颜色
 function updateFileDisplay(filteredCommits) {
   let lines = filteredCommits.flatMap((d) => d.lines);
+  let colors = d3.scaleOrdinal(d3.schemeTableau10); // [Step 2.4] 创建技术颜色标度
   let files = d3
     .groups(lines, (d) => d.file)
     .map(([name, lines]) => {
       return { name, lines };
-    });
+    })
+    .sort((a, b) => b.lines.length - a.lines.length); // [Step 2.3] 按行数降序排序
 
   let filesContainer = d3
     .select('#files')
@@ -445,13 +447,14 @@ function updateFileDisplay(filteredCommits) {
     .html((d) => `${d.lines.length} lines`)
     .style('display', 'block');
 
-  // 为每行代码添加一个点
+  // 为每行代码添加一个点并设置颜色
   filesContainer
     .select('dd')
     .selectAll('div')
     .data((d) => d.lines)
     .join('div')
-    .attr('class', 'loc');
+    .attr('class', 'loc')
+    .attr('style', (d) => `--color: ${colors(d.type)}`); // [Step 2.4] 基于技术类型设置颜色
 }
 
 function onTimeSliderChange(data) {
