@@ -489,15 +489,10 @@ dl.info dd {
 
 /* 现有点的样式，不应用过渡 */
 circle {
-  transition: none; 
-  
+  transition: all 200ms, r calc(var(--r) * 100ms);
 }
-circle.new-circle {
-  transition: r 0.5s ease;
-}
-
 @starting-style {
-  circle.new-circle {
+  circle {
     r: 0;
   }
 }
