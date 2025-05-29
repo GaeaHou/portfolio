@@ -286,7 +286,7 @@ function renderScatterPlot(data, commits) {
     .selectAll("text")
     .style("font-size", "0.75em");
   
-    // ✅ 添加 brushing
+    // [Fix] 确保 brush 在 SVG 创建后绑定
     const brush = d3.brush()
       .extent([[usableArea.left, usableArea.top], [usableArea.right, usableArea.bottom]])
       .on("start brush end", brushed);
@@ -342,6 +342,12 @@ function renderScatterPlot(data, commits) {
   
     function brushed(event) {
       const selection = event.selection;
+      if (!selection) {
+        d3.selectAll("circle").classed("selected", false);
+        renderSelectionCount(null);
+        renderLanguageBreakdown(null);
+        return;
+      }
       d3.selectAll("circle").classed("selected", d =>
         isCommitSelected(selection, d)
       );
