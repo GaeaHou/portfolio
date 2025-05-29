@@ -25,16 +25,7 @@
       <time id="commit-time"></time>
     </label>
   </div>
-  <dl id="files">
-    <!-- we want the following structure for each file:
-    <div>
-      <dt>
-        <code>{file.name}</code>
-      </dt>
-      <dd>{file.lines.length} lines</dd>
-    </div>
-    -->
-  </dl>
+  
   <div class="stat-grid" id="stats"></div>
 
   <div id="chart"></div>
@@ -47,7 +38,32 @@
       <div class="lang-percent"></div>
     </div>
   </div>
-
+  <div id="scrolly-1">
+    <div id="scatter-story">some filler text here</div>
+    <div id="scatter-plot">
+      <div id="stats"></div>
+      <div id="chart"></div>
+      <div id="commit-tooltip">
+        <a id="commit-link"></a><br>
+        Date: <span id="commit-date"></span><br>
+        Time: <span id="commit-time"></span><br>
+        Author: <span id="commit-author"></span><br>
+        Lines: <span id="commit-lines"></span>
+      </div>
+      <div id="selection-count"></div>
+      <div id="language-breakdown"></div>
+    </div>
+  </div>
+  <dl id="files">
+    <!-- we want the following structure for each file:
+    <div>
+      <dt>
+        <code>{file.name}</code>
+      </dt>
+      <dd>{file.lines.length} lines</dd>
+    </div>
+    -->
+  </dl>
   <!-- ✅ 5. Tooltip -->
   <dl id="commit-tooltip" class="info tooltip" hidden>
     <dt>Commit</dt>
@@ -61,6 +77,7 @@
     <dt>Lines edited</dt>
     <dd id="commit-lines"></dd>
   </dl>
+  
 
 </body>
 </html>
