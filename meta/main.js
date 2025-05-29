@@ -129,13 +129,11 @@ function updateScatterPlot(data, commits) {
   const sortedCommits = d3.sort(commits, (d) => -d.totalLines);
   dots
     .selectAll('circle')
-    // [Step 1.3] 添加键函数以稳定圆圈
     .data(sortedCommits, (d) => d.id)
     .join('circle')
     .attr('cx', (d) => xScale(d.datetime))
     .attr('cy', (d) => yScale(d.hourFrac))
     .attr('r', (d) => rScale(d.totalLines))
-    // [Step 1.4] 设置 --r CSS 变量
     .style('--r', (d) => rScale(d.totalLines))
     .attr('fill', 'steelblue')
     .style('fill-opacity', 0.7)
@@ -215,12 +213,11 @@ function renderScatterPlot(data, commits) {
     svg.append('g')
       .attr('class', 'dots')
       .selectAll('circle')
-      .data(sortedCommits, (d) => d.id) // [Step 1.3] 添加键函数以稳定圆圈
+      .data(sortedCommits, (d) => d.id)
       .join('circle')
       .attr('cx', (d) => xScale(d.datetime))
       .attr('cy', (d) => yScale(d.hourFrac))
       .attr('r', (d) => rScale(d.totalLines))
-      // [Step 1.4] 设置 --r CSS 变量
       .style('--r', (d) => rScale(d.totalLines))
       .attr('fill', (d) => colorScale(d.hourFrac))
       .attr('stroke', 'black')
@@ -415,6 +412,31 @@ function renderLanguageBreakdown(selection) {
     }
 }
 
+// [Step 2.1] 添加 updateFileDisplay 函数
+function updateFileDisplay(filteredCommits) {
+  let lines = filteredCommits.flatMap((d) => d.lines);
+  let files = d3
+    .groups(lines, (d) => d.file)
+    .map(([name, lines]) => {
+      return { name, lines };
+    });
+
+  let filesContainer = d3
+    .select('#files')
+    .selectAll('div')
+    .data(files, (d) => d.name)
+    .join(
+      (enter) =>
+        enter.append('div').call((div) => {
+          div.append('dt').append('code');
+          div.append('dd');
+        }),
+    );
+
+  filesContainer.select('dt > code').text((d) => d.name);
+  filesContainer.select('dd').text((d) => `${d.lines.length} lines`);
+}
+
 function onTimeSliderChange(data) {
   commitProgress = +d3.select('#commit-progress').property('value');
   commitMaxTime = timeScale.invert(commitProgress);
@@ -424,6 +446,8 @@ function onTimeSliderChange(data) {
   filteredCommits = commits.filter((d) => d.datetime <= commitMaxTime);
   updateScatterPlot(data, filteredCommits);
   renderCommitInfo(data, filteredCommits);
+  // [Step 2.1] 调用 updateFileDisplay 更新文件显示
+  updateFileDisplay(filteredCommits);
 }
 
 async function main() {
@@ -443,6 +467,8 @@ async function main() {
     d3.select('#commit-progress').on('input', () => onTimeSliderChange(data));
     renderCommitInfo(data, commits);
     renderScatterPlot(data, commits);
+    // [Step 2.1] 初始调用 updateFileDisplay
+    updateFileDisplay(commits);
 }
 
 main();
