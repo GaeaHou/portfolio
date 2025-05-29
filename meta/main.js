@@ -1,6 +1,7 @@
 import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 
 let commitProgress = 100;
+let xScale, yScale, colorScale;
 let timeScale;
 let commitMaxTime;
 let filteredCommits = [];
@@ -138,7 +139,7 @@ function renderScatterPlot(data, commits) {
   svg.append('g')
     .attr('class', 'dots')
     .selectAll('circle')
-    .data(sortedCommits)
+    .data(sortedCommits, d => d.id)
     .join('circle')
     .attr('cx', d => xScale(d.datetime))
     .attr('cy', d => yScale(d.hourFrac))
