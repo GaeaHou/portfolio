@@ -10,6 +10,8 @@ let filteredCommits = null;
 let xScale = null;
 let yScale = null;
 let colorScale = null;
+// [Fix] 添加全局变量 commits
+let commits = null;
 
 async function loadData() {
     const data = await d3.csv('loc.csv', (row) => ({
@@ -427,7 +429,8 @@ function onTimeSliderChange(data) {
 
 async function main() {
     const data = await loadData();
-    const commits = processCommits(data);
+    // [Fix] 将 commits 赋值给全局变量
+    commits = processCommits(data);
     // [1.1] 初始化 timeScale
     timeScale = d3
       .scaleTime()
