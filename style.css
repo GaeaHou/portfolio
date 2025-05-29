@@ -915,13 +915,16 @@ small {
   position: relative;
   display: flex;
   gap: 1rem;
+
   > * {
     flex: 1;
   }
 }
+
 #scatter-story {
   position: relative;
 }
+
 #scatter-plot {
   position: sticky;
   top: 0;
