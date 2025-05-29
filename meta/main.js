@@ -410,7 +410,8 @@ function renderLanguageBreakdown(selection) {
 }
 
 // [1.1] 添加 onTimeSliderChange 函数
-function onTimeSliderChange() {
+// [Fix] 修改 onTimeSliderChange 接受 data 参数
+function onTimeSliderChange(data) {
   commitProgress = +d3.select('#commit-progress').property('value');
   commitMaxTime = timeScale.invert(commitProgress);
   d3.select('#commit-time').text(
@@ -441,8 +442,8 @@ async function main() {
     d3.select('#commit-time').text(
       commitMaxTime.toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })
     );
-    // [1.1] 添加滑块事件监听器
-    d3.select('#commit-progress').on('input', onTimeSliderChange);
+    // [Fix] 修改滑块事件监听器，传递 data 参数
+    d3.select('#commit-progress').on('input', () => onTimeSliderChange(data));
     renderCommitInfo(data, commits);
     renderScatterPlot(data, commits);
 }
