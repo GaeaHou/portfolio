@@ -17,13 +17,26 @@
 
 
   <h2 id="chart-title">Commits by time of day</h2>
-  <div style="display: flex; align-items: baseline; margin-bottom: 1em;">
-    <label style="flex: 1;">
+  <div style="margin-bottom: 1.5em; width: 60%; max-width: 600px;">
+    <label for="commit-progress" style="display: block; font-weight: bold; margin-bottom: 0.5em;">
       Show commits until:
-      <input type="range" id="commit-progress" min="0" max="100" value="100" />
     </label>
-    <time id="commit-time" style="margin-left: auto;">—</time>
+    <input
+      type="range"
+      id="commit-progress"
+      min="0"
+      max="100"
+      value="100"
+      style="width: 100%;"
+    />
+    <time
+      id="commit-time"
+      style="display: block; text-align: right; margin-top: 0.25em; font-size: 0.9em; color: #555;"
+    >
+      —
+    </time>
   </div>
+  
   <div id="chart"></div>
 
   <p id="selection-count">No commits selected</p>

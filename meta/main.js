@@ -3,6 +3,9 @@ import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7.9.0/+esm';
 let commitProgress = 100;
 let timeScale;
 let commitMaxTime;
+let filteredCommits = [];
+let commits = [];
+let data = [];
 
 async function loadData() {
   const data = await d3.csv('loc.csv', (row) => ({
@@ -49,6 +52,10 @@ function onTimeSliderChange() {
     dateStyle: "long",
     timeStyle: "short"
   });
+
+  filteredCommits = commits.filter((d) => d.datetime <= commitMaxTime);
+  updateScatterPlot(data, filteredCommits);
+  renderCommitInfo(data, filteredCommits);
 }
 
 function renderCommitInfo(data, commits) {
@@ -74,232 +81,176 @@ function renderCommitInfo(data, commits) {
   cards.append("div").attr("class", "stat-value").text(d => d.value);
 }
 
-  function renderScatterPlot(data, commits) {
-    const width = 1000;
-    const height = 600;
-    const margin = { top: 10, right: 10, bottom: 40, left: 50 };
-  
-    const usableArea = {
-      top: margin.top,
-      right: width - margin.right,
-      bottom: height - margin.bottom,
-      left: margin.left,
-      width: width - margin.left - margin.right,
-      height: height - margin.top - margin.bottom,
-    };
-  
-    const svg = d3
-      .select('#chart')
-      .append('svg')
-      .attr('viewBox', `0 0 ${width} ${height + 60}`)
-      .style('overflow', 'visible');
-  
-    const xScale = d3.scaleTime()
-      .domain(d3.extent(commits, d => d.datetime))
-      .range([usableArea.left, usableArea.right])
-      .nice();
-  
-    const yScale = d3.scaleLinear()
-      .domain([0, 24])
-      .range([usableArea.bottom, usableArea.top]);
-  
-    const colorScale = d3.scaleSequential()
-      .domain([0, 24])
-      .interpolator(d3.interpolateWarm);
-  
-    const [minLines, maxLines] = d3.extent(commits, d => d.totalLines);
-    const rScale = d3.scaleSqrt()
-      .domain([minLines, maxLines])
-      .range([3, 20]);
-  
-    svg.append('g')
-      .attr('transform', `translate(${usableArea.left}, 0)`)
-      .call(d3.axisLeft(yScale).tickFormat('').tickSize(-usableArea.width));
-  
-    svg.append('g')
-      .attr('transform', `translate(${usableArea.left}, 0)`)
-      .call(d3.axisLeft(yScale).tickFormat(d => String(d % 24).padStart(2, '0') + ':00'));
-  
-    svg.append('g')
-      .attr('transform', `translate(0, ${usableArea.bottom})`)
-      .call(d3.axisBottom(xScale));
-  
-    const sortedCommits = d3.sort(commits, d => -d.totalLines);
-  
-    svg.append('g')
-      .attr('class', 'dots')
-      .selectAll('circle')
-      .data(sortedCommits)
-      .join('circle')
-      .attr('cx', d => xScale(d.datetime))
-      .attr('cy', d => yScale(d.hourFrac))
-      .attr('r', d => rScale(d.totalLines))
-      .attr('fill', d => colorScale(d.hourFrac))
-      .attr('stroke', 'black')
-      .attr('stroke-width', 0.2)
-      .style('fill-opacity', 0.7)
-      .on('mouseenter', (event, commit) => {
-        d3.select(event.currentTarget).style('fill-opacity', 1);
-        renderTooltipContent(commit);
-        updateTooltipVisibility(true);
-        updateTooltipPosition(event);
-      })
-      .on('mousemove', updateTooltipPosition)
-      .on('mouseleave', (event) => {
-        d3.select(event.currentTarget).style('fill-opacity', 0.7);
-        updateTooltipVisibility(false);
-      });
-  
-    // ✅ 添加图例（颜色条）
-    const legendWidth = 300;
-    const legendHeight = 12;
+function renderScatterPlot(data, commits) {
+  const width = 1000;
+  const height = 600;
+  const margin = { top: 10, right: 10, bottom: 40, left: 50 };
 
-    const legendGroup = svg.append("g")
-    .attr("class", "legend")
-    .attr("transform", `translate(${(width - legendWidth) / 2}, ${height + 40})`);
+  const usableArea = {
+    top: margin.top,
+    right: width - margin.right,
+    bottom: height - margin.bottom,
+    left: margin.left,
+    width: width - margin.left - margin.right,
+    height: height - margin.top - margin.bottom,
+  };
 
-    const legendScale = d3.scaleLinear().domain([0, 24]).range([0, legendWidth]);
+  const svg = d3
+    .select('#chart')
+    .append('svg')
+    .attr('viewBox', `0 0 ${width} ${height + 60}`)
+    .style('overflow', 'visible');
 
-    const gradientId = "legend-gradient";
+  xScale = d3.scaleTime()
+    .domain(d3.extent(commits, d => d.datetime))
+    .range([usableArea.left, usableArea.right])
+    .nice();
 
-    // 定义渐变色
-    const defs = svg.append("defs");
-    const linearGradient = defs.append("linearGradient")
-    .attr("id", gradientId)
-    .attr("x1", "0%").attr("x2", "100%")
-    .attr("y1", "0%").attr("y2", "0%");
+  yScale = d3.scaleLinear()
+    .domain([0, 24])
+    .range([usableArea.bottom, usableArea.top]);
 
-    for (let i = 0; i <= 24; i++) {
-    linearGradient.append("stop")
-        .attr("offset", `${(i / 24) * 100}%`)
-        .attr("stop-color", colorScale(i));
-    }
+  colorScale = d3.scaleSequential()
+    .domain([0, 24])
+    .interpolator(d3.interpolateWarm);
 
-    // 绘制渐变矩形
-    legendGroup.append("rect")
-    .attr("width", legendWidth)
-    .attr("height", legendHeight)
-    .style("fill", `url(#${gradientId})`)
-    .attr("stroke", "#ccc")
-    .attr("stroke-width", 0.5);
+  const [minLines, maxLines] = d3.extent(commits, d => d.totalLines);
+  const rScale = d3.scaleSqrt()
+    .domain([minLines, maxLines])
+    .range([3, 20]);
 
-    // 添加刻度
-    const legendAxis = d3.axisBottom(legendScale)
-    .tickValues([0, 6, 12, 18, 24])
-    .tickFormat(d => {
-        if (d === 0) return "Midnight";
-        if (d === 6) return "6am";
-        if (d === 12) return "Noon";
-        if (d === 18) return "6pm";
-        if (d === 24) return "Midnight";
-        return d;
+  svg.append('g')
+    .attr('transform', `translate(${usableArea.left}, 0)`)
+    .call(d3.axisLeft(yScale).tickFormat('').tickSize(-usableArea.width));
+
+  svg.append('g')
+    .attr('transform', `translate(${usableArea.left}, 0)`)
+    .attr('class', 'y-axis')
+    .call(d3.axisLeft(yScale).tickFormat(d => String(d % 24).padStart(2, '0') + ':00'));
+
+  svg.append('g')
+    .attr('transform', `translate(0, ${usableArea.bottom})`)
+    .attr('class', 'x-axis')
+    .call(d3.axisBottom(xScale));
+
+  const sortedCommits = d3.sort(commits, d => -d.totalLines);
+
+  svg.append('g')
+    .attr('class', 'dots')
+    .selectAll('circle')
+    .data(sortedCommits)
+    .join('circle')
+    .attr('cx', d => xScale(d.datetime))
+    .attr('cy', d => yScale(d.hourFrac))
+    .attr('r', d => rScale(d.totalLines))
+    .attr('fill', d => colorScale(d.hourFrac))
+    .attr('stroke', 'black')
+    .attr('stroke-width', 0.2)
+    .style('fill-opacity', 0.7)
+    .on('mouseenter', (event, commit) => {
+      d3.select(event.currentTarget).style('fill-opacity', 1);
+      renderTooltipContent(commit);
+      updateTooltipVisibility(true);
+      updateTooltipPosition(event);
+    })
+    .on('mousemove', updateTooltipPosition)
+    .on('mouseleave', (event) => {
+      d3.select(event.currentTarget).style('fill-opacity', 0.7);
+      updateTooltipVisibility(false);
     });
+}
 
-    legendGroup.append("g")
-    .attr("transform", `translate(0, ${legendHeight})`)
-    .call(legendAxis)
-    .selectAll("text")
-    .style("font-size", "0.75em");
-  
-    // ✅ 添加 brushing
-    const brush = d3.brush()
-      .extent([[usableArea.left, usableArea.top], [usableArea.right, usableArea.bottom]])
-      .on("start brush end", brushed);
-    svg.call(brush);
-  
-    svg.selectAll('.dots, .overlay ~ *').raise();
-  
-    // ✅ 实现 brushing 逻辑和辅助函数（定义在 renderScatterPlot 内部）
-    function isCommitSelected(selection, commit) {
-      if (!selection) return false;
-      const [[x0, y0], [x1, y1]] = selection;
-      const x = xScale(commit.datetime);
-      const y = yScale(commit.hourFrac);
-      return x0 <= x && x <= x1 && y0 <= y && y <= y1;
-    }
-  
-    function renderSelectionCount(selection) {
-      const selectedCommits = selection
-        ? commits.filter((d) => isCommitSelected(selection, d))
-        : [];
-      const countElement = document.getElementById('selection-count');
-      countElement.textContent = `${
-        selectedCommits.length || 'No'
-      } commits selected`;
-      return selectedCommits;
-    }
-  
-    function renderLanguageBreakdown(selection) {
-        const selectedCommits = selection
-          ? commits.filter((d) => isCommitSelected(selection, d))
-          : [];
-        const container = document.getElementById('language-breakdown');
-        container.className = 'language-columns';  // 设置 class
-        container.innerHTML = '';
-      
-        if (selectedCommits.length === 0) return;
-      
-        const lines = selectedCommits.flatMap((d) => d.lines);
-        const breakdown = d3.rollup(lines, v => v.length, d => d.type);
-      
-        for (const [lang, count] of breakdown) {
-          const proportion = count / lines.length;
-          const langDiv = document.createElement('div');
-          langDiv.className = 'lang-block';
-          langDiv.innerHTML = `
-            <div class="lang-name">${lang.toUpperCase()}</div>
-            <div class="lang-lines">${count} lines</div>
-            <div class="lang-percent">(${d3.format('.1~%')(proportion)})</div>
-          `;
-          container.appendChild(langDiv);
-        }
-      }
-  
-    function brushed(event) {
-      const selection = event.selection;
-      d3.selectAll("circle").classed("selected", d =>
-        isCommitSelected(selection, d)
-      );
-      renderSelectionCount(selection);
-      renderLanguageBreakdown(selection);
-    }
-  }
+function updateScatterPlot(data, commits) {
+  const width = 1000;
+  const height = 600;
+  const margin = { top: 10, right: 10, bottom: 40, left: 50 };
+  const usableArea = {
+    top: margin.top,
+    right: width - margin.right,
+    bottom: height - margin.bottom,
+    left: margin.left,
+    width: width - margin.left - margin.right,
+    height: height - margin.top - margin.bottom,
+  };
 
-  function renderTooltipContent(commit) {
-    document.getElementById('commit-link').href = commit.url;
-    document.getElementById('commit-link').textContent = commit.id;
-    document.getElementById('commit-date').textContent = commit.datetime.toLocaleDateString();
-    document.getElementById('commit-time').textContent = commit.datetime.toLocaleTimeString();
-    document.getElementById('commit-author').textContent = commit.author;
-    document.getElementById('commit-lines').textContent = commit.totalLines;
-  }
-  
-  function updateTooltipVisibility(isVisible) {
-    document.getElementById('commit-tooltip').hidden = !isVisible;
-  }
-  
-  function updateTooltipPosition(event) {
-    const tooltip = document.getElementById('commit-tooltip');
-    tooltip.style.left = `${event.clientX + 10}px`;
-    tooltip.style.top = `${event.clientY + 10}px`;
-  }
-  
-  async function main() {
-    const data = await loadData();
-    const commits = processCommits(data);
-    renderCommitInfo(data, commits);
-    renderScatterPlot(data, commits);
-  
-    // 初始化 timeScale 和 commitMaxTime
-    timeScale = d3.scaleTime()
-      .domain([
-        d3.min(commits, (d) => d.datetime),
-        d3.max(commits, (d) => d.datetime)
-      ])
-      .range([0, 100]);
-  
-    document.getElementById('commit-progress').addEventListener('input', onTimeSliderChange);
-    onTimeSliderChange();
-  }
-  
-  main();
+  const svg = d3.select('#chart').select('svg');
+
+  xScale.domain(d3.extent(commits, (d) => d.datetime));
+
+  const [minLines, maxLines] = d3.extent(commits, (d) => d.totalLines);
+  const rScale = d3.scaleSqrt().domain([minLines, maxLines]).range([3, 20]);
+
+  const xAxis = d3.axisBottom(xScale);
+  const xAxisGroup = svg.select('g.x-axis');
+  xAxisGroup.selectAll('*').remove();
+  xAxisGroup.call(xAxis);
+
+  const dots = svg.select('g.dots');
+  const sortedCommits = d3.sort(commits, (d) => -d.totalLines);
+
+  dots
+    .selectAll('circle')
+    .data(sortedCommits, d => d.id)
+    .join(
+      enter => enter.append('circle')
+        .attr('stroke', 'black')
+        .attr('stroke-width', 0.2)
+        .style('fill-opacity', 0.7)
+        .on('mouseenter', (event, commit) => {
+          d3.select(event.currentTarget).style('fill-opacity', 1);
+          renderTooltipContent(commit);
+          updateTooltipVisibility(true);
+          updateTooltipPosition(event);
+        })
+        .on('mousemove', updateTooltipPosition)
+        .on('mouseleave', (event) => {
+          d3.select(event.currentTarget).style('fill-opacity', 0.7);
+          updateTooltipVisibility(false);
+        }),
+      update => update,
+      exit => exit.remove()
+    )
+    .attr('cx', (d) => xScale(d.datetime))
+    .attr('cy', (d) => yScale(d.hourFrac))
+    .attr('r', (d) => rScale(d.totalLines))
+    .attr('fill', (d) => colorScale(d.hourFrac));
+}
+
+function renderTooltipContent(commit) {
+  document.getElementById('commit-link').href = commit.url;
+  document.getElementById('commit-link').textContent = commit.id;
+  document.getElementById('commit-date').textContent = commit.datetime.toLocaleDateString();
+  document.getElementById('commit-time').textContent = commit.datetime.toLocaleTimeString();
+  document.getElementById('commit-author').textContent = commit.author;
+  document.getElementById('commit-lines').textContent = commit.totalLines;
+}
+
+function updateTooltipVisibility(isVisible) {
+  document.getElementById('commit-tooltip').hidden = !isVisible;
+}
+
+function updateTooltipPosition(event) {
+  const tooltip = document.getElementById('commit-tooltip');
+  tooltip.style.left = `${event.clientX + 10}px`;
+  tooltip.style.top = `${event.clientY + 10}px`;
+}
+
+async function main() {
+  data = await loadData();
+  commits = processCommits(data);
+  filteredCommits = commits;
+  renderCommitInfo(data, commits);
+  renderScatterPlot(data, commits);
+
+  timeScale = d3.scaleTime()
+    .domain([
+      d3.min(commits, (d) => d.datetime),
+      d3.max(commits, (d) => d.datetime)
+    ])
+    .range([0, 100]);
+
+  document.getElementById('commit-progress').addEventListener('input', onTimeSliderChange);
+  onTimeSliderChange();
+}
+
+main();
