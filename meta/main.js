@@ -129,15 +129,18 @@ function updateScatterPlot(data, commits) {
   const sortedCommits = d3.sort(commits, (d) => -d.totalLines);
   dots
     .selectAll('circle')
-    .data(sortedCommits)
+    // [Step 1.3] 添加键函数以稳定圆圈
+    .data(sortedCommits, (d) => d.id)
     .join('circle')
     .attr('cx', (d) => xScale(d.datetime))
     .attr('cy', (d) => yScale(d.hourFrac))
     .attr('r', (d) => rScale(d.totalLines))
+    // [Step 1.4] 设置 --r CSS 变量
+    .style('--r', (d) => rScale(d.totalLines))
     .attr('fill', 'steelblue')
-    .style('fill-opacity', 0.7) // Add transparency for overlapping dots
+    .style('fill-opacity', 0.7)
     .on('mouseenter', (event, commit) => {
-      d3.select(event.currentTarget).style('fill-opacity', 1); // Full opacity on hover
+      d3.select(event.currentTarget).style('fill-opacity', 1);
       renderTooltipContent(commit);
       updateTooltipVisibility(true);
       updateTooltipPosition(event);
@@ -198,12 +201,10 @@ function renderScatterPlot(data, commits) {
       .call(d3.axisLeft(yScale).tickFormat(d => String(d % 24).padStart(2, '0') + ':00'));
   
     svg.append('g')
-      // [1.2] 为 x 轴添加类名
       .attr('transform', `translate(0, ${usableArea.bottom})`)
       .attr('class', 'x-axis')
       .call(d3.axisBottom(xScale));
   
-    // [1.2] 为 y 轴添加类名
     svg.append('g')
       .attr('transform', `translate(${usableArea.left}, 0)`)
       .attr('class', 'y-axis')
@@ -214,12 +215,14 @@ function renderScatterPlot(data, commits) {
     svg.append('g')
       .attr('class', 'dots')
       .selectAll('circle')
-      .data(sortedCommits)
+      .data(sortedCommits, (d) => d.id) // [Step 1.3] 添加键函数以稳定圆圈
       .join('circle')
-      .attr('cx', d => xScale(d.datetime))
-      .attr('cy', d => yScale(d.hourFrac))
-      .attr('r', d => rScale(d.totalLines))
-      .attr('fill', d => colorScale(d.hourFrac))
+      .attr('cx', (d) => xScale(d.datetime))
+      .attr('cy', (d) => yScale(d.hourFrac))
+      .attr('r', (d) => rScale(d.totalLines))
+      // [Step 1.4] 设置 --r CSS 变量
+      .style('--r', (d) => rScale(d.totalLines))
+      .attr('fill', (d) => colorScale(d.hourFrac))
       .attr('stroke', 'black')
       .attr('stroke-width', 0.2)
       .style('fill-opacity', 0.7)
@@ -235,58 +238,54 @@ function renderScatterPlot(data, commits) {
         updateTooltipVisibility(false);
       });
   
-    // ✅ 添加图例（颜色条）
+    // 添加图例（颜色条）
     const legendWidth = 300;
     const legendHeight = 12;
 
     const legendGroup = svg.append("g")
-    .attr("class", "legend")
-    .attr("transform", `translate(${(width - legendWidth) / 2}, ${height + 40})`);
+      .attr("class", "legend")
+      .attr("transform", `translate(${(width - legendWidth) / 2}, ${height + 40})`);
 
     const legendScale = d3.scaleLinear().domain([0, 24]).range([0, legendWidth]);
 
     const gradientId = "legend-gradient";
 
-    // 定义渐变色
     const defs = svg.append("defs");
     const linearGradient = defs.append("linearGradient")
-    .attr("id", gradientId)
-    .attr("x1", "0%").attr("x2", "100%")
-    .attr("y1", "0%").attr("y2", "0%");
+      .attr("id", gradientId)
+      .attr("x1", "0%").attr("x2", "100%")
+      .attr("y1", "0%").attr("y2", "0%");
 
     for (let i = 0; i <= 24; i++) {
-    linearGradient.append("stop")
+      linearGradient.append("stop")
         .attr("offset", `${(i / 24) * 100}%`)
         .attr("stop-color", colorScale(i));
     }
 
-    // 绘制渐变矩形
     legendGroup.append("rect")
-    .attr("width", legendWidth)
-    .attr("height", legendHeight)
-    .style("fill", `url(#${gradientId})`)
-    .attr("stroke", "#ccc")
-    .attr("stroke-width", 0.5);
+      .attr("width", legendWidth)
+      .attr("height", legendHeight)
+      .style("fill", `url(#${gradientId})`)
+      .attr("stroke", "#ccc")
+      .attr("stroke-width", 0.5);
 
-    // 添加刻度
     const legendAxis = d3.axisBottom(legendScale)
-    .tickValues([0, 6, 12, 18, 24])
-    .tickFormat(d => {
+      .tickValues([0, 6, 12, 18, 24])
+      .tickFormat(d => {
         if (d === 0) return "Midnight";
         if (d === 6) return "6am";
         if (d === 12) return "Noon";
         if (d === 18) return "6pm";
         if (d === 24) return "Midnight";
         return d;
-    });
+      });
 
     legendGroup.append("g")
-    .attr("transform", `translate(0, ${legendHeight})`)
-    .call(legendAxis)
-    .selectAll("text")
-    .style("font-size", "0.75em");
+      .attr("transform", `translate(0, ${legendHeight})`)
+      .call(legendAxis)
+      .selectAll("text")
+      .style("font-size", "0.75em");
   
-    // [Fix] 确保 brush 在 SVG 创建后绑定
     const brush = d3.brush()
       .extent([[usableArea.left, usableArea.top], [usableArea.right, usableArea.bottom]])
       .on("start brush end", brushed);
@@ -294,7 +293,6 @@ function renderScatterPlot(data, commits) {
   
     svg.selectAll('.dots, .overlay ~ *').raise();
   
-    // ✅ 实现 brushing 逻辑和辅助函数（定义在 renderScatterPlot 内部）
     function isCommitSelected(selection, commit) {
       if (!selection) return false;
       const [[x0, y0], [x1, y1]] = selection;
@@ -315,30 +313,30 @@ function renderScatterPlot(data, commits) {
     }
   
     function renderLanguageBreakdown(selection) {
-        const selectedCommits = selection
-          ? commits.filter((d) => isCommitSelected(selection, d))
-          : [];
-        const container = document.getElementById('language-breakdown');
-        container.className = 'language-columns';  // 设置 class
-        container.innerHTML = '';
-      
-        if (selectedCommits.length === 0) return;
-      
-        const lines = selectedCommits.flatMap((d) => d.lines);
-        const breakdown = d3.rollup(lines, v => v.length, d => d.type);
-      
-        for (const [lang, count] of breakdown) {
-          const proportion = count / lines.length;
-          const langDiv = document.createElement('div');
-          langDiv.className = 'lang-block';
-          langDiv.innerHTML = `
-            <div class="lang-name">${lang.toUpperCase()}</div>
-            <div class="lang-lines">${count} lines</div>
-            <div class="lang-percent">(${d3.format('.1~%')(proportion)})</div>
-          `;
-          container.appendChild(langDiv);
-        }
+      const selectedCommits = selection
+        ? commits.filter((d) => isCommitSelected(selection, d))
+        : [];
+      const container = document.getElementById('language-breakdown');
+      container.className = 'language-columns';
+      container.innerHTML = '';
+    
+      if (selectedCommits.length === 0) return;
+    
+      const lines = selectedCommits.flatMap((d) => d.lines);
+      const breakdown = d3.rollup(lines, v => v.length, d => d.type);
+    
+      for (const [lang, count] of breakdown) {
+        const proportion = count / lines.length;
+        const langDiv = document.createElement('div');
+        langDiv.className = 'lang-block';
+        langDiv.innerHTML = `
+          <div class="lang-name">${lang.toUpperCase()}</div>
+          <div class="lang-lines">${count} lines</div>
+          <div class="lang-percent">(${d3.format('.1~%')(proportion)})</div>
+        `;
+        container.appendChild(langDiv);
       }
+    }
   
     function brushed(event) {
       const selection = event.selection;
@@ -371,7 +369,7 @@ function updateTooltipVisibility(isVisible) {
 
 function updateTooltipPosition(event) {
     const tooltip = document.getElementById('commit-tooltip');
-    tooltip.style.left = `${event.clientX + 10}px`;  // 偏移一点
+    tooltip.style.left = `${event.clientX + 10}px`;
     tooltip.style.top = `${event.clientY + 10}px`;
 }
 
@@ -417,27 +415,20 @@ function renderLanguageBreakdown(selection) {
     }
 }
 
-// [1.1] 添加 onTimeSliderChange 函数
-// [Fix] 修改 onTimeSliderChange 接受 data 参数
 function onTimeSliderChange(data) {
   commitProgress = +d3.select('#commit-progress').property('value');
   commitMaxTime = timeScale.invert(commitProgress);
   d3.select('#commit-time').text(
     commitMaxTime.toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })
   );
-  // [1.2] 过滤 commits 生成 filteredCommits
   filteredCommits = commits.filter((d) => d.datetime <= commitMaxTime);
-  // [1.2] 使用 updateScatterPlot 更新散点图
   updateScatterPlot(data, filteredCommits);
-  // [1.2] 更新 commit statistics
   renderCommitInfo(data, filteredCommits);
 }
 
 async function main() {
     const data = await loadData();
-    // [Fix] 将 commits 赋值给全局变量
     commits = processCommits(data);
-    // [1.1] 初始化 timeScale
     timeScale = d3
       .scaleTime()
       .domain([
@@ -445,13 +436,10 @@ async function main() {
         d3.max(commits, (d) => d.datetime),
       ])
       .range([0, 100]);
-    // [1.1] 初始化 commitMaxTime
     commitMaxTime = timeScale.invert(commitProgress);
-    // [1.1] 初始化时间显示
     d3.select('#commit-time').text(
       commitMaxTime.toLocaleString('en-US', { dateStyle: 'long', timeStyle: 'short' })
     );
-    // [Fix] 修改滑块事件监听器，传递 data 参数
     d3.select('#commit-progress').on('input', () => onTimeSliderChange(data));
     renderCommitInfo(data, commits);
     renderScatterPlot(data, commits);
