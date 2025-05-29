@@ -897,13 +897,13 @@ dd {
   }
   }
 
-.loc {
-  display: flex;
-  width: 0.5em;
-  aspect-ratio: 1;
-  background: steelblue;
-  border-radius: 50%;
-}
+  .loc {
+    display: flex;
+    width: 0.5em;
+    aspect-ratio: 1;
+    background: var(--color, steelblue); /* [Step 2.4] 使用 --color 变量 */
+    border-radius: 50%;
+  }
 
 small {
   font-size: 0.8em;
