@@ -912,6 +912,9 @@ small {
 }
 
 #scrolly-1 {
+  width: 80%;
+  max-width: 1200px;
+  margin: 0 auto;
   position: relative;
   display: flex;
   gap: 1rem;
