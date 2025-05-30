@@ -23,7 +23,7 @@ html[color-scheme="dark"] {
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
-  max-width: 100ch;
+  max-width: 120ch;
   margin-inline: auto;
   padding: 2em 1em;
 }
@@ -912,7 +912,7 @@ small {
 }
 
 #scrolly-1 {
-  width: 120%;
+  width: 100%;
   margin: 0 auto;
   position: relative;
   display: flex;
